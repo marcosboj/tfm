@@ -1,0 +1,164 @@
+
+def caracteristicas_consumo(csv):
+    import pandas as pd
+    datos_consumo = pd.read_csv(csv)
+    
+       
+
+    datos_consumo.head()
+
+    """#Crear timestamp"""
+
+    datos_consumo['time'] = datos_consumo['time'].replace('24:00','00:00')
+    datos_consumo['timestamp'] = pd.to_datetime(datos_consumo['date'] + ' ' + datos_consumo['time'])
+    datos_consumo.head()
+
+    """#Caracteristicas básicas
+
+    Consumo medio
+
+    Desviación estándar del consumo
+
+    Consumo máximo y mínimo
+
+    Consumo en percentiles
+
+    Consumo total acumulado
+    """
+
+    media_consumo = datos_consumo['consumptionKWh'].mean()
+    media_consumo
+
+    std_consumo = datos_consumo['consumptionKWh'].std()
+    std_consumo
+
+    max_consumo = datos_consumo['consumptionKWh'].max()
+    min_consumo = datos_consumo['consumptionKWh'].min()
+    min_consumo, max_consumo
+
+    percentil_25_consumo = datos_consumo['consumptionKWh'].quantile(0.25)
+    percentil_50_consumo = datos_consumo['consumptionKWh'].quantile(0.5)
+    percentil_75_consumo = datos_consumo['consumptionKWh'].quantile(0.75)
+
+    percentil_25_consumo, percentil_50_consumo, percentil_75_consumo
+
+    sum_consumo = datos_consumo['consumptionKWh'].sum()
+    sum_consumo
+
+    """#Características temporales
+
+    Horarios
+
+    Semanales
+
+    Estacionales
+
+    ##Promedio por hora
+    """
+
+    consumo_por_horas = datos_consumo.groupby(['time'])['consumptionKWh'].mean()
+    media_consumos_horas = {f'consumo_{str(hora).split(":")[0].zfill(2)}': valor for hora, valor in consumo_por_horas.items()}
+
+    df_media_consumos = pd.DataFrame([media_consumos_horas])
+
+    """##Por ventanas de tiempo del dia
+
+    (Mañana, tarde, noche, madrugada)
+    """
+
+    ventanas_tiempo = {
+        'Mañana': range(6, 12),
+        'Tarde': range(12, 18),
+        'Noche': range(18, 24),
+        'Madrugada': range(0, 6)
+    }
+
+    medias_por_periodo = {
+        periodo: sum(media_consumos_horas[f'consumo_{str(h).zfill(2)}']for h in horas) / len(horas)
+        for periodo, horas in ventanas_tiempo.items()
+    }
+
+    df_medias_por_periodo = pd.DataFrame([medias_por_periodo])
+    
+
+    """##Por día de la semana"""
+
+    datos_consumo['dia_semana'] = datos_consumo['timestamp'].dt.dayofweek
+    media_por_dia = datos_consumo.groupby('dia_semana')['consumptionKWh'].mean()
+    dias_nombre = {0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves', 4: 'Viernes', 5: 'Sábado', 6: 'Domingo'}
+    media_por_dia = media_por_dia.rename(index=dias_nombre)
+    df_media_por_dia = media_por_dia.to_frame().T
+
+    
+
+    """## Entresemana o finde"""
+    datos_consumo['grupo_dia'] = datos_consumo['dia_semana'].apply(lambda x: 'Fin de semana' if x >= 5 else 'Entre semana')
+    media_por_grupo = datos_consumo.groupby('grupo_dia')['consumptionKWh'].mean()
+    df_media_por_grupo = media_por_grupo.to_frame().T  # Asegura que "Entre semana" y "Fin de semana" sean columnas
+
+    """## Por estación"""
+    datos_consumo['estacion'] = datos_consumo['timestamp'].dt.month.map(
+        lambda x: 'invierno' if x in [12,1,2] else 
+                'primavera' if x in [3,4,5] else 
+                'verano' if x in [6,7,8] else 'otoño'
+    )
+
+    """##Por estación"""
+    estaciones = datos_consumo.groupby('estacion')['consumptionKWh'].mean()
+    df_estaciones = estaciones.to_frame().T
+
+   
+
+    """#Promedio de consumo total en un día"""
+
+    promedio_por_dia = datos_consumo.groupby(datos_consumo['timestamp'].dt.date)['consumptionKWh'].mean().mean()
+
+    promedio_por_dia
+
+    """#Sumatorios
+    Por mes distinguiendo años
+
+    Por semana
+    """
+
+    # Consumo mensual
+    consumo_mensual = datos_consumo.groupby(datos_consumo['timestamp'].dt.to_period('M'))['consumptionKWh'].sum()
+    df_consumo_mensual = consumo_mensual.to_frame().T  # Convierte los meses en columnas
+
+    # Consumo semanal
+    consumo_semanal = datos_consumo.groupby(datos_consumo['timestamp'].dt.to_period('W'))['consumptionKWh'].sum()
+    df_consumo_semanal = consumo_semanal.to_frame().T  # Convierte las semanas en columnas
+
+
+    # Organizar los resultados en un diccionario
+    resultado = {
+        'media_consumo': media_consumo,
+        'std_consumo':std_consumo,
+        'min_consumo':min_consumo,
+        'max_consumo':max_consumo,
+        'percentil_25_consumo':percentil_25_consumo,
+        'percentil_50_consumo':percentil_50_consumo,
+        'percentil_75_consumo':percentil_75_consumo,
+        'sum_consumo':sum_consumo,
+        
+        'promedio_por_dia': promedio_por_dia    
+        
+    }
+    
+    df_resultado = pd.DataFrame([resultado])
+    for df in [df_media_consumos, df_medias_por_periodo, df_media_por_dia, 
+           df_media_por_grupo, df_estaciones, df_consumo_mensual, 
+           df_consumo_semanal, df_resultado]:
+        df.index = [0] 
+    resultados = pd.concat([df_resultado, df_media_consumos, df_medias_por_periodo,
+                            df_media_por_dia, df_media_por_grupo,df_estaciones,
+                            df_consumo_mensual, df_consumo_semanal], axis=1)
+    print(type(resultados))
+    #resultados.to_csv("resultados_finales.csv", index=True)
+    
+
+
+    return resultados
+
+
+    
