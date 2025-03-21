@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumo Energético</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            font-size: 22px;
+            color: #007bff;
+        }
+
+        .dato {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            background: #f8f9fa;
+        }
+
+        .alerta {
+            color: red;
+            font-weight: bold;
+        }
+
+        .dato span {
+            color: #007bff;
+        }
+    </style>
+
+    <script>
+        function cargarDatos() {
+            google.script.run.withSuccessHandler(function(data) {
+                document.getElementById("fecha_inicio").innerText = data.fecha_inicio;
+                document.getElementById("fecha_fin").innerText = data.fecha_fin;
+                document.getElementById("ultimo_dia_datos").innerText = data.ultimo_dia_datos;
+                document.getElementById("coste_ultimo_dia").innerText = data.coste_ultimo_dia + " €";
+                document.getElementById("coste_acumulado").innerText = data.coste_acumulado + " €";
+                document.getElementById("contador_kWh").innerText = data.contador_kWh + " kWh";
+                document.getElementById("limite_kWh").innerText = data.limite_kWh + " kWh";
+
+                const sobrepasado = document.getElementById("sobrepasado_limite");
+                sobrepasado.innerText = data.sobrepasado_limite ? "Sí" : "No";
+                if (data.sobrepasado_limite) {
+                    sobrepasado.classList.add("alerta");
+                } else {
+                    sobrepasado.classList.remove("alerta");
+                }
+
+                document.getElementById("kWh_restantes").innerText = data.kWh_restantes + " kWh";
+            }).getDatos();
+        }
+
+        window.onload = cargarDatos;
+    </script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>¿Cuánto me va a costar la factura de la luz?</h1>
+
+        <div class="dato">📅 <strong>Periodo de Facturación:</strong> <br> 
+            <span id="fecha_inicio"></span> → <span id="fecha_fin"></span>
+        </div>
+
+        <div class="dato">📊 <strong>Último día con datos:</strong> <br> 
+            <span id="ultimo_dia_datos"></span>
+        </div>
+
+        <div class="dato">💰 <strong>Coste último día:</strong> <br> 
+            <span id="coste_ultimo_dia"></span>
+        </div>
+
+        <div class="dato">💳 <strong>Coste acumulado del periodo de facturación:</strong> <br> 
+            <span id="coste_acumulado"></span>
+        </div>
+
+        <div class="dato">⚡ <strong>Consumo total en kWh del periodo de facturación:</strong> <br> 
+            <span id="contador_kWh"></span>
+        </div>
+
+        <div class="dato">🎯 <strong>Límite de kWh rebajados que te corresponden:</strong> <br> 
+            <span id="limite_kWh"></span>
+        </div>
+
+        <div class="dato">🚨 <strong>¿Has sobrepasado el límite?:</strong> <br> 
+            <span id="sobrepasado_limite"></span>
+        </div>
+
+        <div class="dato">📉 <strong>kWh restantes con rebaja:</strong> <br> 
+            <span id="kWh_restantes"></span>
+        </div>
+
+    </div>
+
+</body>
+</html>
+

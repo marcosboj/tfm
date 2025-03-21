@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <style>
+        /* Estilos para el loader */
+        #loader {
+            display: none;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* Estilos para ocultar el formulario de dirección inicialmente */
+        #addressForm {
+            display: none;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+    
+      function toggleAddressForm() {
+        let form = document.getElementById("addressForm");
+        form.style.display = (form.style.display === "none") ? "block" : "none";
+      }
+
+      function showLoader() {
+        document.getElementById("loader").style.display = "block";
+      }
+
+      function hideLoader() {
+        document.getElementById("loader").style.display = "none";
+      }
+      function loadChart() {
+        google.script.run.withSuccessHandler(showChart).getChartImage();
+      }
+
+      function showChart(imageUrl) {
+        if (imageUrl.startsWith("data:image")) {
+          document.getElementById('chart_img').src = imageUrl;
+        } else {
+            document.getElementById('chart_div').innerHTML = "<p>No se encontró una gráfica en la hoja de cálculo.</p>";
+          }
+      }
+        
+      function loadAnalysisData() {
+        google.script.run.withSuccessHandler(function(data) {
+            console.log("📌 Datos recibidos en HTML:", data); // Depuración en consola
+
+            if (!data || !data.resumen || !data.precios || !data.amortizacion) {
+                console.error("❌ Error: Datos incompletos o no recibidos correctamente.");
+                return;
+            }
+
+            displayAnalysisData(data);
+        }).getAnalysisData();
+      }
+
+      function displayAnalysisData(data) {
+        // Mostrar en los campos de texto los valores predeterminados
+        document.getElementById("consumoAnual").innerText = data.resumen.consumoAnual + " kWh/año";
+        document.getElementById("produccionAnual").innerText = data.resumen.produccionAnual + " kWh/año";
+        document.getElementById("consumoHorasSolares").innerText = data.resumen.consumoHorasSolares + " kWh/año";
+
+        // Crear Tabla Mensual
+        let tableHTML = "<table border='1' style='border-collapse: collapse; width: 100%; text-align: center;'>";
+        data.resumenMensual.forEach(row => {
+            tableHTML += "<tr>";
+            row.forEach(cell => {
+                tableHTML += `<td style='padding: 5px;'>${cell}</td>`;
+            });
+            tableHTML += "</tr>";
+        });
+        tableHTML += "</table>";
+        document.getElementById("resumenMensual").innerHTML = tableHTML;
+
+        // Mostrar Reparto Producción
+        document.getElementById("energiaAutoconsumida").innerText = data.repartoProduccion.energiaAutoconsumida + " kWh";
+        document.getElementById("energiaExcedente").innerText = data.repartoProduccion.energiaExcedente + " kWh";
+
+        // Asignar valores predeterminados en los inputs de precios
+        document.getElementById("precioCompra").value = data.precios.precioCompra;
+        document.getElementById("precioVenta").value = data.precios.precioVenta;
+        document.getElementById("costoSinSolar").innerText = data.precios.costoSinSolar + " €/año";
+        document.getElementById("costoConSolar").innerText = data.precios.costoConSolar + " €/año";
+
+        // Asignar valores predeterminados en los campos de amortización
+        document.getElementById("precioPorKW").innerText = data.amortizacion.precioPorKW + " €/kW";
+        document.getElementById("precioInicial").innerText = data.amortizacion.precioInicial + " €";
+        document.getElementById("ahorroAnual").innerText = data.amortizacion.ahorroAnual + " €/año";
+        document.getElementById("anosAmortizacion").innerText = data.amortizacion.anosAmortizacion;
+        document.getElementById("ahorro30anos").innerText = data.amortizacion.ahorro30anos + " €";
+
+        // Asignar el tamaño de instalación seleccionado en el desplegable
+        let sizeSelect = document.getElementById("sizeSelect");
+        let opciones = ["< 5 kW", "5 - 10 kW", "10 - 20 kW", "20 - 30 kW", "30 - 50 kW", "50 - 75 kW", "75 - 100 kW"];
+
+        sizeSelect.innerHTML = "";
+        opciones.forEach(size => {
+            let option = document.createElement("option");
+            option.value = size;
+            option.innerText = size;
+            if (size === data.amortizacion.tamanoSeleccionado) {
+              option.selected = true; // Selecciona la opción actual de la hoja
+              }
+            sizeSelect.appendChild(option);
+        });
+        
+      }
+
+      function updateMonthAndPower() {
+        let selectedMonth = document.getElementById("monthSelect").value;
+        let selectedPower = document.getElementById("powerSelect").value;
+
+        google.script.run.withSuccessHandler(refreshData).updateMonthAndPower(selectedMonth, selectedPower);
+      }
+
+      function updateAddress() {
+        showLoader();
+        let street = document.getElementById("street").value;
+        let number = document.getElementById("number").value;
+        let postalCode = document.getElementById("postalCode").value;
+        let city = document.getElementById("city").value;
+        let province = document.getElementById("province").value;
+        let inclinacion = document.getElementById("inclinacion").value;
+        let orientacion = document.getElementById("orientacion").value;
+
+        google.script.run.withSuccessHandler(function() {
+            hideLoader();
+            refreshData();
+            loadCurrentAddress();
+        }).updateAddress(street, number, postalCode, city, province, inclinacion, orientacion);
+      }
+
+      function refreshData() {
+        loadChart();
+        loadAnalysisData();
+      }
+      
+      function loadCurrentAddress() {
+        google.script.run.withSuccessHandler(function(address) {
+          document.getElementById("currentAddress").innerText = address;
+        }).getCurrentAddress();
+      }
+
+      window.onload = function() {
+        loadChart();
+        loadAnalysisData();;
+        loadCurrentAddress();
+      };
+    </script>
+</head>
+<body>
+        <fieldset>
+        <legend><b>Opciones de Simulación</b></legend>
+        <label for="monthSelect">Selecciona un mes:</label>
+        <select id="monthSelect">
+            <option value="Enero">Enero</option>
+            <option value="Febrero">Febrero</option>
+            <option value="Marzo">Marzo</option>
+            <option value="Abril">Abril</option>
+            <option value="Mayo">Mayo</option>
+            <option value="Junio">Junio</option>
+            <option value="Julio">Julio</option>
+            <option value="Agosto">Agosto</option>
+            <option value="Septiembre">Septiembre</option>
+            <option value="Octubre">Octubre</option>
+            <option value="Noviembre">Noviembre</option>
+            <option value="Diciembre">Diciembre</option>
+        </select>
+
+        <label for="powerSelect">Potencia instalada (kW):</label>
+        <select id="powerSelect">
+            <option value="0.5">0.5 kW</option>
+            <option value="1">1 kW</option>
+            <option value="1.5">1.5 kW</option>
+            <option value="2">2 kW</option>
+            <option value="2.5">2.5 kW</option>
+            <option value="3">3 kW</option>
+            <option value="3.5">3.5 kW</option>
+            <option value="4">4 kW</option>
+            <option value="4.5">4.5 kW</option>
+            <option value="5">5 kW</option>
+            
+        </select>
+
+        <button onclick="updateMonthAndPower()">Actualizar Datos</button>
+    </fieldset>
+    <p><strong>Dirección de la instalacion:</strong> <span id="currentAddress">Cargando...</span></p>
+
+    <h2>Gráfica: </h2>
+    <div id="chart_div">
+        <img id="chart_img" style="width:100%; max-width:800px;">
+    </div>
+
+    
+    <button onclick="toggleAddressForm()">☀️ Cambiar Dirección de la instalación☀️</button>
+    <div id="addressForm">
+    <fieldset>
+        <legend><b>Dirección</b></legend>
+        <label for="street">Calle:</label>
+        <input type="text" id="street"><br>
+
+        <label for="number">Número:</label>
+        <input type="text" id="number"><br>
+
+        <label for="postalCode">Código Postal:</label>
+        <input type="text" id="postalCode"><br>
+
+        <label for="city">Localidad:</label>
+        <input type="text" id="city"><br>
+
+        <label for="province">Provincia:</label>
+        <input type="text" id="province"><br>
+
+        <label for="inclinacion">Inclinación de los paneles:</label>
+        <input type="text" id="inclinacion"><br>
+
+        <label for="orientacion">Orientacion de los paneles (0 Sur; 90 Oeste; -90 Este):</label>
+        <input type="text" id="orientacion"><br>
+        
+
+
+        <button onclick="updateAddress()">Actualizar Dirección</button>
+    </fieldset>
+  </div>
+  <div id="loader">🔄 Cargando, por favor espera...</div>
+
+  <h2>🔎 Análisis de los Datos</h2>
+
+  <h3>📊 Resumen General</h3>
+  <ul>
+      <li><strong>Consumo kWh/año:</strong> <span id="consumoAnual"></span></li>
+      <li><strong>Producción kWh/año:</strong> <span id="produccionAnual"></span></li>
+      <li><strong>Consumo en horas solares kWh/año:</strong> <span id="consumoHorasSolares"></span></li>
+  </ul>
+
+  <h3>📆 Resumen por Mes</h3>
+  <div id="resumenMensual"></div>
+
+  <h3>⚡ ¿Cómo se reparte la producción?</h3>
+  <ul>
+      <li><strong>Energía autoconsumida:</strong> <span id="energiaAutoconsumida"></span></li>
+      <li><strong>Energía excedentaria:</strong> <span id="energiaExcedente"></span></li>
+  </ul>
+  <img id="chartAutoconsumo" style="width:100%; max-width:800px;">
+
+  <h3>📌 Recordatorio</h3>
+  <p id="recordatorioTexto"></p>
+  <img id="imagenResumen" style="width:100%; max-width:500px;">
+
+  <h3>💰 Si incluimos precios...</h3>
+  <label>Precio de compra:</label> <input type="text" id="precioCompra">
+  <label>Precio de venta:</label> <input type="text" id="precioVenta">
+  <p><strong>Gasto sin energía solar:</strong> <span id="costoSinSolar"></span></p>
+  <p><strong>Gasto con energía solar:</strong> <span id="costoConSolar"></span></p>
+
+  <h3>📉 Calculamos la Amortización</h3>
+  <label>Selecciona tamaño de instalación:</label>
+  <select id="sizeSelect"></select>
+  <p><strong>Precio por kW:</strong> <span id="precioPorKW"></span></p>
+  <p><strong>Precio inicial:</strong> <span id="precioInicial"></span></p>
+  <p><strong>Ahorro anual:</strong> <span id="ahorroAnual"></span></p>
+  <p><strong>Años de amortización:</strong> <span id="anosAmortizacion"></span></p>
+  <p><strong>Ahorro potencial en 30 años:</strong> <span id="ahorro30anos"></span></p>
+
+  <h3>📢 Nota Final</h3>
+  <p>Ten en cuenta que los cálculos se han hecho sobre un año sin autoconsumo. Si mueves tu consumo a las horas centrales del día, mejorarás significativamente estos números.</p>
+</body>
+</html>
