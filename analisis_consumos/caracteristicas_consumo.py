@@ -1,4 +1,22 @@
+"""
+Descripción:
+Obtener caracteristicas de consumos de cada CUPS en funcion de su historico: medias, maximos, ...
 
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: python caracteristicas_consumos.py, (csv con datos de hasta dos años de consumo por horas)
+    Devuelve las características de consumo de ese csv
+    
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+"""
 def caracteristicas_consumo(csv):
     import pandas as pd
     datos_consumo = pd.read_csv(csv)

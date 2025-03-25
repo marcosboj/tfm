@@ -1,6 +1,26 @@
+/*
+Descripción:
+  Desarollado para APPSCRIPT y Spreadsheet de google. 
+  API PVGIS con dirección google maps y despues mostrar en html
+
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: js autoconsumo_perfil.js
+    
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+*/
+
 function getPVGISDataPLusEstadilla() {
   // Reemplaza con el ID de tu hoja de cálculo
-  var spreadsheetId = '1Sce1itOwXvvrDU13JLt0ZfFMD61qbU8VzImJInv8EBg';
+  var spreadsheetId = 'XXXXXXXXXXXXXXXXXXXXX';
   
   // Obtener la hoja de cálculo por su ID
   var sheet_pv = SpreadsheetApp.openById(spreadsheetId).getSheetByName('PV');
@@ -100,7 +120,7 @@ function getPVGISDataPLusEstadilla() {
   }
 
   function insertDataInSheet(hourlyAverages) {
-    var spreadsheetId = '1Sce1itOwXvvrDU13JLt0ZfFMD61qbU8VzImJInv8EBg';
+    var spreadsheetId = 'XXXXXXXXXXXXXXXXXXXXXXxx';
     var sheet_pv = SpreadsheetApp.openById(spreadsheetId).getSheetByName('PV');
     var startRow = 2;
     var startCol = 15;
@@ -146,7 +166,7 @@ function getPVGISDataPLusEstadilla() {
   }
 
   function insertMonthlyTotalsInSheet(monthlyTotals) {
-    var spreadsheetId = '1Sce1itOwXvvrDU13JLt0ZfFMD61qbU8VzImJInv8EBg';
+    var spreadsheetId = 'XXXXXXXXXXXXXXXXXXXXXX';
     var sheet_pv = SpreadsheetApp.openById(spreadsheetId).getSheetByName('PV');    
     var startRow = 2;
     var startCol = 13;
@@ -169,7 +189,7 @@ function getPVGISDataPLusEstadilla() {
   insertRawDataInSheet(extractedData);
 
   function insertRawDataInSheet(data) {
-  var spreadsheetId = '1Sce1itOwXvvrDU13JLt0ZfFMD61qbU8VzImJInv8EBg';
+  var spreadsheetId = 'XXXXXXXXXXXXXXXXXXXXXXXXXXx';
   var sheet_pv = SpreadsheetApp.openById(spreadsheetId).getSheetByName('PV');
   var startRow = 2; // Empezamos desde la fila 2 para evitar la cabecera
   var startCol = 30; // Columna G para 'date', H para 'time', I para 'Producción (W)'
@@ -194,7 +214,7 @@ function getPVGISDataPLusEstadilla() {
     }
 }
 function getCurrentAddress() {
-  var spreadsheetId = '1Sce1itOwXvvrDU13JLt0ZfFMD61qbU8VzImJInv8EBg';
+  var spreadsheetId = 'XXXXXXXXXXXXXXXXXXXXx';
   var sheet_pv = SpreadsheetApp.openById(spreadsheetId).getSheetByName('PV');
   // Leer la dirección almacenada en la celda A5
   var address = sheet_pv.getRange("A5").getValue();
@@ -204,7 +224,7 @@ function getCurrentAddress() {
 
 
 function getData() {
-  var spreadsheetId = '1Sce1itOwXvvrDU13JLt0ZfFMD61qbU8VzImJInv8EBg';
+  var spreadsheetId = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
   var sheet_vista = SpreadsheetApp.openById(spreadsheetId).getSheetByName('Vista');
   var data = sheet_vista.getDataRange().getValues(); // Obtiene todos los datos
 
@@ -212,7 +232,7 @@ function getData() {
 }
 
 function getChartImage() {
-  var spreadsheetId = '1Sce1itOwXvvrDU13JLt0ZfFMD61qbU8VzImJInv8EBg';
+  var spreadsheetId = 'XXXXXXXXXXXXXXXXXXXXXXX';
   var sheet_vista = SpreadsheetApp.openById(spreadsheetId).getSheetByName('Vista');
   var charts = sheet_vista.getCharts();
   
@@ -225,7 +245,7 @@ function getChartImage() {
   }
 }
 function getTableData() {
-  var spreadsheetId = '1Sce1itOwXvvrDU13JLt0ZfFMD61qbU8VzImJInv8EBg';
+  var spreadsheetId = 'XXXXXXXXXXXXXXXXXXXXXx';
   var sheet_vista = SpreadsheetApp.openById(spreadsheetId).getSheetByName('Vista');
   var range = sheet_vista.getRange("J1:X40"); // Ajusta el rango según la cantidad de filas a mostrar
   var values = range.getValues(); // Obtiene los valores como una matriz
@@ -249,7 +269,7 @@ function getTableData() {
   return result;
 }
 function updateMonthAndPower(month, power) {
-  var spreadsheetId = '1Sce1itOwXvvrDU13JLt0ZfFMD61qbU8VzImJInv8EBg';
+  var spreadsheetId = 'XXXXXXXXXXXXXXx';
   var sheet_vista = SpreadsheetApp.openById(spreadsheetId).getSheetByName('Vista');
   
   // Escribir los valores seleccionados en las celdas correspondientes
@@ -260,7 +280,7 @@ function updateMonthAndPower(month, power) {
   return "Datos actualizados correctamente";
 }
 function updateAddress(street, number, postalCode, city, province, inclinacion, orientacion) {
-  var spreadsheetId = '1Sce1itOwXvvrDU13JLt0ZfFMD61qbU8VzImJInv8EBg';
+  var spreadsheetId = 'XXXXXXXXXXXXXXXXXXXXXXXXXX';
   var sheet_vista = SpreadsheetApp.openById(spreadsheetId).getSheetByName('Vista');
 
   // Formar la dirección completa
@@ -288,7 +308,7 @@ function doGet() {
 }
 
 function getAnalysisData() {
-  var spreadsheetId = '1Sce1itOwXvvrDU13JLt0ZfFMD61qbU8VzImJInv8EBg';
+  var spreadsheetId = 'XXXXXXXXXXXXXXXXXX';
   var sheet_vista = SpreadsheetApp.openById(spreadsheetId).getSheetByName('Vista');
 
   var data = {

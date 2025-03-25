@@ -1,6 +1,25 @@
+/*
+Descripción:
+  Desarollado para APPSCRIPT y Spreadsheet de google. 
+  API PVGIS 
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: js pvgis.js
+    
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+*/
+
 function getPVGISData() {
     // Reemplaza con el ID de tu hoja de cálculo
-    var spreadsheetId = '14uSB6EV49tDwCFv2IzTBcCMxFItK8Gzjx_iqmL6wHNM';
+    var spreadsheetId = 'XXXXXXXXXXXXXXXXXXXXXXXxx';
     
     // Obtener la hoja de cálculo por su ID
     var sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName('PV');

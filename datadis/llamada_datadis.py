@@ -1,3 +1,22 @@
+
+"""
+Descripción:
+  Scrip para iterar sobre un excel para consuultar consumos y potencias a traves de la API de DATADIS, se utiliza otro script datadis.py
+
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: python llamada_datadis.py, datadis.py, Registro de autorizados uno.xlsx
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+"""
+
 import datadis
 import requests
 import pandas as pd

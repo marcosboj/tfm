@@ -1,3 +1,23 @@
+"""
+Descripción:
+    Modelo Kmeans para analizar casos herramienta ENERSOC (ECODES)
+
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: python kmeans_2_todas_var.py,casos_IASS.xlsx
+    resultados_cluster.csv
+    
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler, OneHotEncoder

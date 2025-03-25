@@ -1,4 +1,22 @@
+"""
+Descripción:
+    Script para iterar sobre una carpeta distintos archivos csv que constienen consumos historicos. Cada archivo contiente hasta los dos ultimos años de consumos hora por hora
 
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: python llamada_consumos.py, (carpeta con distintos archivos csv)
+    Devuelve las características de todos los consumos en un archivo: resumen_consumos.csv
+    
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+"""
 
 import pandas as pd
 from pathlib import Path

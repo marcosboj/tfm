@@ -1,6 +1,27 @@
+/*
+Descripción:
+  Desarollado para APPSCRIPT y Spreadsheet de google. 
+  API PVGIS con consulta por hora
+
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: js pvgis_timeseries.js
+    
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+*/
+
+
 function getPVGISDataPLus() {
   // Reemplaza con el ID de tu hoja de cálculo
-  var spreadsheetId = '1U_XWzF1X_pQ4O_vI6AtCRg8WpKnaX2Gckms3eBxYNjM';
+  var spreadsheetId = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXX';
   
   // Obtener la hoja de cálculo por su ID
   var sheet = SpreadsheetApp.openById(spreadsheetId).getSheetByName('PV');

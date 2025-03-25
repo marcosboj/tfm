@@ -1,12 +1,33 @@
+/*
+Descripción:
+  Desarollado para APPSCRIPT y Spreadsheet de google. 
+  API de fronius para consultar producción.
+
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: js api_fronius.js
+    
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+*/
+
+
 function obtenerInstantaeneoPVSystem() {
   // URL base de la API
   var BASE_URL = "https://api.solarweb.com/swqapi";
 
   // Reemplaza con tu pvSystemId
-  var pvSystemId = "740f92fa-7fc6-4596-aa64-2554a698cd20";
+  var pvSystemId = "XXXXXXXXXXXXXxx";
   // Claves de autenticación (sustituye con tus valores reales)
-  var ACCESS_KEY_ID = "FKIA721BECD157854FFFAF13FDA7EF825040";
-  var ACCESS_KEY_VALUE = "1f10ae35-f420-4cef-8cbd-56b54b5a61fa"; 
+  var ACCESS_KEY_ID = "XXXXXXXXXXXXXXXXXX";
+  var ACCESS_KEY_VALUE = "XXXXXXXXXXXXXXXXXX"; 
 
   // Rango de fechas (formato: yyyy-MM-ddTHH:mm:ssZ)
   var fromDate = "2025-03-13T00:00:00Z";  // Ajusta la fecha inicial

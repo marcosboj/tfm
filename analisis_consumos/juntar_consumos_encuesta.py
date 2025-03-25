@@ -1,3 +1,23 @@
+"""
+Descripción:
+    Junta en una misma tabla los datos de la encuesta realzada a cada CUPS con sus caracteristicas de consumo obtenidas. Todo en una misma fila.
+
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: python juntar_consumos_encuesta.py, encuesta_consumos_oliver.csv, resumen_consumos.csv
+    datos_combinados.csv
+    
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+"""
+
 import pandas as pd
 from pathlib import Path
 

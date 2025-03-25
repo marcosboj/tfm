@@ -1,3 +1,27 @@
+"""
+Descripción:
+    Clustering de las variables de consumo obtenidas. No tiene en cuenta las de las encuestas.
+    Algunas de las variables no las estoy utilizando para que tenga cada CUPS el mismo numero de variables.
+    Hay casos en los que no tiene el mismo número porque por ejemplo una CUPS que tiene info solo de unos meses no puede tener el máx, media o suma de un mes en particular.
+
+
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: python clustering_solo_consumos.py, datos_combinados.csv
+    Cluster (pruebas varias)
+    
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+"""
+
+
 import pandas as pd
 from pathlib import Path
 import numpy as np
@@ -48,7 +72,7 @@ df_scaled = pd.DataFrame(X_scaled, columns=df_sin_id.columns, index=df_sin_id.in
 
 
 
-# --- 5️⃣ Aplicar Clustering ---
+# --- Aplicar Clustering ---
 n_clusters = 3
 kmeans = KMeans(n_clusters=n_clusters, random_state=42)
 clusters = kmeans.fit_predict(X_scaled)
@@ -63,11 +87,11 @@ ruta_completa_archivo = path_actual/ "fichreos_consumo_y_potencias/Oliver/vivien
 df_final.to_csv(ruta_completa_archivo, index=False)
 
 
-# --- 7️⃣ Evaluación con Silhouette Score ---
+# --- Evaluación con Silhouette Score ---
 silhouette_avg = silhouette_score(X_scaled, clusters)
 print(f"Silhouette Score: {silhouette_avg:.4f}")
 
-# --- 8️⃣ Visualización con PCA ---
+# --- Visualización con PCA ---
 pca = PCA(n_components=2)
 X_pca = pca.fit_transform(X_scaled)
 df_final['pca_1'] = X_pca[:, 0]

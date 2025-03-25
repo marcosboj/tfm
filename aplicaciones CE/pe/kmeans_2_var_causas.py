@@ -1,3 +1,26 @@
+"""
+Descripción:
+    Modelo Kmeans para analizar casos herramienta ENERSOC (ECODES). Centrado en las variables que tienen que ver con las causas
+
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: python kmeans_2_var_casusas.py,casos_IASS.xlsx
+    resultado_clusters_acotado.csv
+    centroides_desescalados.csv
+    atos_desescalados.csv
+
+    
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler, OneHotEncoder

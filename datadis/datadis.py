@@ -1,3 +1,25 @@
+
+"""
+Descripción:
+  Scrip para conexión con la API de DATADIS. Se usa para descargar consumos y potnecias de personas que te hayan autorizados.
+
+Licencia: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)  
+Fecha: 24/03/2025
+
+Desarrollo: Marcos Boj Pérez, Nora Barroso.
+
+Código: Marcos Boj Pérez
+
+Ejecución: python datadis.py 
+    (conusmos).csv es el archivo con los picos de fluorescencia.
+    (potencias).csv contiene los eventos registrados.
+
+
+Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
+This software is provided ""as-is,"" without any express or implied warranty.
+"""
+
+
 def datadis(token,NIF, CUPS, n_supplie, nombre_apellidos):
     
     import requests
