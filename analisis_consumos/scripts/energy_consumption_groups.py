@@ -1,6 +1,6 @@
 from pathlib import Path
+from typing import Any
 
-import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 
@@ -18,10 +18,11 @@ def process_timestamp(df: pd.DataFrame, datetime_column: str, tz: str) -> pd.Dat
     return modified_df
 
 
-def clustering(X: np.ndarray, n_clusters: int, random_state: int | None) -> KMeans:
+def clustering(df: pd.DataFrame, features: list[str], n_clusters: int, random_state: int | None) -> tuple[Any, KMeans]:
+    X = df[features].values
     kmeans = KMeans(n_clusters=n_clusters, random_state=random_state)
-    kmeans.fit(X)
-    return kmeans
+    clusters = kmeans.fit_predict(X)
+    return clusters, kmeans
 
 
 def main(csv_file: Path, datetime_column: str = "datetime"):
@@ -36,16 +37,18 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
         df = add_sine_cosine_transformation(df, "hour", 24)
 
     # Clustering
-    cluster_column: str = "cluster"
     nif_column: str = "nif"
     features = [
         "media_consumo", "std_consumo", "min_consumo", "max_consumo"
     ]
-    kmeans = clustering(df[features].values, 2, RANDOM_STATE)
-    df[cluster_column] = kmeans.labels_
-    groups = df.groupby(by=cluster_column)[nif_column].unique()
-    for cluster, value in groups.items():
-        print(f"Cluster {cluster}: {", ".join(value)}")
+    for n_clusters in range(2, 3):
+        clusters, _ = clustering(df, features, n_clusters, RANDOM_STATE)
+        label_column = f"{n_clusters}_clusters_label"
+        df[label_column] = clusters
+        groups = df.groupby(by=label_column)[nif_column].unique()
+        print(f"KMeans(n_clusters={n_clusters}, random_state={RANDOM_STATE}) results:")
+        for cluster, value in groups.items():
+            print(f"Cluster {cluster}: {", ".join(value)}")
 
 
 if __name__ == "__main__":
