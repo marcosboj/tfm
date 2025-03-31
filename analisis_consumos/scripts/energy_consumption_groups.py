@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 
@@ -15,6 +16,12 @@ def process_timestamp(df: pd.DataFrame, datetime_column: str, tz: str) -> pd.Dat
     modified_df[datetime_column] = pd.to_datetime(df[datetime_column], utc=True).dt.tz_convert(tz=tz)
 
     return modified_df
+
+
+def clustering(X: np.ndarray, n_clusters: int, random_state: int | None) -> KMeans:
+    kmeans = KMeans(n_clusters=n_clusters, random_state=random_state)
+    kmeans.fit(X)
+    return kmeans
 
 
 def main(csv_file: Path, datetime_column: str = "datetime"):
@@ -34,10 +41,8 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
     features = [
         "media_consumo", "std_consumo", "min_consumo", "max_consumo"
     ]
-    x = df[features].values
-    kmeans = KMeans(n_clusters=2, random_state=RANDOM_STATE)
-    kmeans.fit(x)
-    df[cluster_column] = kmeans.predict(x)
+    kmeans = clustering(df[features].values, 2, RANDOM_STATE)
+    df[cluster_column] = kmeans.labels_
     groups = df.groupby(by=cluster_column)[nif_column].unique()
     for cluster, value in groups.items():
         print(f"Cluster {cluster}: {", ".join(value)}")
