@@ -1,4 +1,4 @@
-nif,cups,mean_consumption,std_consumption,min_consumption,max_consumption,percentile_25_consumption,percentile_50_consumption,percentile_75_consumption,winter,autumn,spring,summer
+nif,cups,media_consumo,std_consumo,min_consumo,max_consumo,percentil_25_consumo,percentil_50_consumo,percentil_75_consumo,invierno,otoño,primavera,verano
 "X0","0",1,2,1,2,1,2,1,2,1,2,1
 "Y1","1",1,4,1,4,1,4,1,4,1,4,1
 "Z2","2",1,0,1,0,1,0,1,0,1,0,1

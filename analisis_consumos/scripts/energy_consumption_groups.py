@@ -10,33 +10,35 @@ from tfm.feature_engineering.cyclical_encoding import add_sine_cosine_transforma
 from tfm.utils.data_frame import add_timestamp_values
 
 
-def process_timestamp(df: pd.DataFrame, tz: str) -> pd.DataFrame:
+def process_timestamp(df: pd.DataFrame, datetime_column: str, tz: str) -> pd.DataFrame:
     modified_df = df.copy()
-    modified_df["datetime"] = pd.to_datetime(df["datetime"], utc=True).dt.tz_convert(tz=tz)
+    modified_df[datetime_column] = pd.to_datetime(df[datetime_column], utc=True).dt.tz_convert(tz=tz)
 
     return modified_df
 
 
-def main(csv_file: Path):
+def main(csv_file: Path, datetime_column: str = "datetime"):
     df = pd.read_csv(
         csv_file,
         dtype={'nif': str}
     )
-    if "datetime" in df.columns:
-        df = process_timestamp(df, TIME_ZONE)
+    if datetime_column in df.columns:
+        df = process_timestamp(df, datetime_column, TIME_ZONE)
         # Add time-related features
-        df = add_timestamp_values(df, "datetime")
+        df = add_timestamp_values(df, datetime_column)
         df = add_sine_cosine_transformation(df, "hour", 24)
 
     # Clustering
+    cluster_column: str = "cluster"
+    nif_column: str = "nif"
     features = [
-        "mean_consumption", "std_consumption", "min_consumption", "max_consumption"
+        "media_consumo", "std_consumo", "min_consumo", "max_consumo"
     ]
     x = df[features].values
     kmeans = KMeans(n_clusters=2, random_state=RANDOM_STATE)
     kmeans.fit(x)
-    df["cluster"] = kmeans.predict(x)
-    groups = df.groupby(by="cluster")['nif'].unique()
+    df[cluster_column] = kmeans.predict(x)
+    groups = df.groupby(by=cluster_column)[nif_column].unique()
     for cluster, value in groups.items():
         print(f"Cluster {cluster}: {", ".join(value)}")
 
