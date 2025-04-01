@@ -1,5 +1,9 @@
 from pathlib import Path
-from typing import Any
+from typing import (
+    Any,
+    Literal,
+    Optional
+)
 
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -18,9 +22,17 @@ def process_timestamp(df: pd.DataFrame, datetime_column: str, tz: str) -> pd.Dat
     return modified_df
 
 
-def clustering(df: pd.DataFrame, features: list[str], n_clusters: int, random_state: int | None) -> tuple[Any, KMeans]:
+def clustering(
+        df: pd.DataFrame, features: list[str], n_clusters: int, random_state: Optional[int] = None,
+        n_init: int | Literal["auto"] = "auto", max_iter: int = 300
+) -> tuple[Any, KMeans]:
     X = df[features].values
-    kmeans = KMeans(n_clusters=n_clusters, random_state=random_state)
+    kmeans = KMeans(
+        n_clusters=n_clusters,
+        random_state=random_state,
+        n_init=n_init,
+        max_iter=max_iter
+    )
     clusters = kmeans.fit_predict(X)
     return clusters, kmeans
 
@@ -42,7 +54,7 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
         "media_consumo", "std_consumo", "min_consumo", "max_consumo"
     ]
     for n_clusters in range(2, 3):
-        clusters, _ = clustering(df, features, n_clusters, RANDOM_STATE)
+        clusters, _ = clustering(df, features, n_clusters, random_state=RANDOM_STATE)
         label_column = f"{n_clusters}_clusters_label"
         df[label_column] = clusters
         groups = df.groupby(by=label_column)[nif_column].unique()
