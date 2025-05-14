@@ -33,7 +33,7 @@ print(path_actual)
 carpeta_now = path_actual
 print(carpeta_now)
 # Construir el path del archivo en la carpeta anterior (por ejemplo, archivo.csv)
-carpeta = carpeta_now / "fichreos_consumo_y_potencias/Oliver/viviendas/consumos"
+carpeta = carpeta_now / "data/viviendas/consumos"
 print(carpeta)
 
 # Listar todos los archivos CSV en la carpeta
@@ -53,7 +53,7 @@ for archivo in archivos:
     
     df_resultado = resultado
     # Extraer la parte del nombre del archivo que empieza con 'ES0031' y termina antes del primer punto '.'
-    match = re.search(r"ES0031[^.]*", archivo)
+    match = re.search(r"^[A-Z]+", archivo)
     if match:
         parte_archivo = match.group(0)  # Extrae la parte correspondiente
     else:
@@ -66,5 +66,5 @@ for archivo in archivos:
     df_resultados = pd.concat([df_resultados, df_resultado], ignore_index=True)
 
 # Guardar el DataFrame final a un CSV
-ruta_completa_archivo = carpeta / "resumen_consumos.csv"
+ruta_completa_archivo = carpeta_now / "data/viviendas/resumen_consumos.csv"
 df_resultados.to_csv(ruta_completa_archivo, index=False)

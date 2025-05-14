@@ -17,19 +17,36 @@ Ejecución: python caracteristicas_consumos.py, (csv con datos de hasta dos año
 Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
 This software is provided ""as-is,"" without any express or implied warranty.
 """
+import pandas as pd
+from tfm.utils.data_frame import add_timestamp_values
+
 def caracteristicas_consumo(csv):
-    import pandas as pd
-    datos_consumo = pd.read_csv(csv)
+    datos_consumo = pd.read_csv(csv, sep=";")
     
        
-
+    #print(datos_consumo.columns)
     datos_consumo.head()
 
-    """#Crear timestamp"""
+    # 2. Arreglar posibles 24:00 en 'time'
+    if 'time' in datos_consumo.columns:
+        datos_consumo['time'] = datos_consumo['time'].replace('24:00', '00:00')
+
+    # 3. Crear la columna 'timestamp'
+    datos_consumo['timestamp'] = pd.to_datetime(datos_consumo['date'] + ' ' + datos_consumo['time'], 
+                                                format='%d/%m/%Y %H:%M', errors='coerce')
+
+    # 4. Añadir columnas de hora, día de la semana, mes
+    datos_consumo = add_timestamp_values(datos_consumo, 'timestamp')
+
+    # 5. Mostrar para comprobar
+    #print(datos_consumo.head())
+    
+
+    """#Crear timestamp
 
     datos_consumo['time'] = datos_consumo['time'].replace('24:00','00:00')
     datos_consumo['timestamp'] = pd.to_datetime(datos_consumo['date'] + ' ' + datos_consumo['time'])
-    datos_consumo.head()
+    datos_consumo.head()"""
 
     """#Caracteristicas básicas
 
@@ -74,8 +91,11 @@ def caracteristicas_consumo(csv):
     ##Promedio por hora
     """
 
-    consumo_por_horas = datos_consumo.groupby(['time'])['consumptionKWh'].mean()
-    media_consumos_horas = {f'consumo_{str(hora).split(":")[0].zfill(2)}': valor for hora, valor in consumo_por_horas.items()}
+    consumo_por_horas = datos_consumo.groupby('hour')['consumptionKWh'].mean()
+    # Crear el diccionario formateado
+    media_consumos_horas = {
+        f'consumo_{str(hora).zfill(2)}': valor for hora, valor in consumo_por_horas.items()
+    }
 
     df_media_consumos = pd.DataFrame([media_consumos_horas])
 
@@ -92,7 +112,7 @@ def caracteristicas_consumo(csv):
     }
 
     medias_por_periodo = {
-        periodo: sum(media_consumos_horas[f'consumo_{str(h).zfill(2)}']for h in horas) / len(horas)
+        periodo: consumo_por_horas[consumo_por_horas.index.isin(horas)].mean()
         for periodo, horas in ventanas_tiempo.items()
     }
 
@@ -101,8 +121,7 @@ def caracteristicas_consumo(csv):
 
     """##Por día de la semana"""
 
-    datos_consumo['dia_semana'] = datos_consumo['timestamp'].dt.dayofweek
-    media_por_dia = datos_consumo.groupby('dia_semana')['consumptionKWh'].mean()
+    media_por_dia = datos_consumo.groupby('dayofweek')['consumptionKWh'].mean()
     dias_nombre = {0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves', 4: 'Viernes', 5: 'Sábado', 6: 'Domingo'}
     media_por_dia = media_por_dia.rename(index=dias_nombre)
     df_media_por_dia = media_por_dia.to_frame().T
@@ -110,15 +129,15 @@ def caracteristicas_consumo(csv):
     
 
     """## Entresemana o finde"""
-    datos_consumo['grupo_dia'] = datos_consumo['dia_semana'].apply(lambda x: 'Fin de semana' if x >= 5 else 'Entre semana')
+    datos_consumo['grupo_dia'] = datos_consumo['dayofweek'].apply(lambda x: 'Fin de semana' if x >= 5 else 'Entre semana')
     media_por_grupo = datos_consumo.groupby('grupo_dia')['consumptionKWh'].mean()
     df_media_por_grupo = media_por_grupo.to_frame().T  # Asegura que "Entre semana" y "Fin de semana" sean columnas
 
     """## Por estación"""
-    datos_consumo['estacion'] = datos_consumo['timestamp'].dt.month.map(
-        lambda x: 'invierno' if x in [12,1,2] else 
-                'primavera' if x in [3,4,5] else 
-                'verano' if x in [6,7,8] else 'otoño'
+    datos_consumo['estacion'] = datos_consumo['month'].map(
+        lambda x: 'invierno' if x in [12, 1, 2] else 
+                'primavera' if x in [3, 4, 5] else 
+                'verano' if x in [6, 7, 8] else 'otoño'
     )
 
     """##Por estación"""
