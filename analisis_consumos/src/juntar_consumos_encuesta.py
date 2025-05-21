@@ -37,16 +37,28 @@ df_encuesta = pd.read_csv(archivo_encuesta)
 df_consumos = df_consumos.rename(columns={"archivo": "ID"})
 #df_encuesta = df_encuesta.rename(columns={"ID": "nif"})
 #df_nif_cups = df_nif_cups.rename(columns={"CUPS": "cups", "DNI/NIE": "nif"})
-
+#print(df_consumos['ID'].duplicated().sum())  # ¿Hay IDs duplicados en df_consumos?
+#print(df_encuesta['ID'].duplicated().sum())  # ¿Hay IDs duplicados en df_encuesta?
 # **1️⃣ Unir datos de consumo con la tabla de relación usando CUPS**
 df_merged = pd.merge(df_consumos, df_encuesta, on="ID", how="left")
+'''
+print("IDs en df_consumos:")
+print(sorted(df_consumos["ID"].unique()))
 
+print("\nIDs en df_encuesta:")
+print(sorted(df_encuesta["ID"].unique()))
+print("IDs en df_consumos:")
+print(sorted(df_consumos["ID"].unique()))
+
+print("\nIDs en df_encuesta:")
+print(sorted(df_encuesta["ID"].unique()))
+'''
 # **2️⃣ Unir el resultado con las características de vivienda usando DNI**
 #df_juntos = pd.merge(df_merged, df_encuesta, on="nif", how="left")
 #columnas = ["nif"] + [col for col in df_juntos.columns if col != "nif"]
 #df_juntos = df_juntos[columnas]
 
-print(df_merged)
+#print(df_merged)
 
 # **3️⃣ Guardar el resultado en un nuevo CSV**
 #df_merged.to_csv("datos_combinados.csv", index=False)

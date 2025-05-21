@@ -39,6 +39,7 @@ def clustering(
 
 def main(csv_file: Path, datetime_column: str = "datetime"):
     import pandas as pd
+    import matplotlib.pyplot as plt
     df = pd.read_csv(
         csv_file,
         dtype={'archivo': str}
@@ -61,35 +62,62 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
         ,"Jueves","Viernes","Sábado","Domingo","Entre semana","Fin de semana"
         
     ]
-    '''
+    
     features = [
         "media_consumo", "std_consumo", "min_consumo", "max_consumo", "percentil_25_consumo", "percentil_50_consumo",
         "percentil_75_consumo","Mañana","Tarde","Noche","Madrugada","Lunes","Martes","Miércoles"
         ,"Jueves","Viernes","Sábado","Domingo","Entre semana","Fin de semana"
         
     ]
-    for n_clusters in range(2, 5):
-        clusters, _ = clustering(df, features, n_clusters, random_state=RANDOM_STATE)
-        label_column = f"{n_clusters}_clusters_label"
-        df[label_column] = clusters
-        groups = df.groupby(by=label_column)[archivo_column].unique()
-        print(f"KMeans(n_clusters={n_clusters}, random_state={RANDOM_STATE}) results:")
-        for cluster, value in groups.items():
-            print(f"Cluster {cluster}: {", ".join(value)}")
+    '''
+    features = [
+        "media_consumo", "std_consumo", "min_consumo", "max_consumo", "percentil_25_consumo", "percentil_50_consumo",
+        "percentil_75_consumo","promedio_por_dia","consumo_medio_diario",
+        "Mañana","Mediodia", "Tarde","Noche","Madrugada","sum_consumo",
+        "Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo","Entre semana","Fin de semana",
+        "s_Mañana","s_Mediodia","s_Tarde","s_Noche","s_Madrugada","s_Lunes","s_Martes","s_Miércoles","s_Jueves","s_Viernes"
+        ,"s_Sábado","s_Domingo","s_Entre semana","s_Fin de semana","s_invierno","s_otoño","s_primavera","s_verano",
+        "std_Mañana","std_Mediodia","std_Tarde","std_Noche","std_Madrugada","std_Lunes","std_Martes","std_Miércoles","std_Jueves","std_Viernes"
+        ,"std_Sábado","std_Domingo","std_Entre semana","std_Fin de semana","std_invierno","std_otoño","std_primavera","std_verano",
+        "Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+        
+    ]
+
     
     from sklearn.preprocessing import StandardScaler
     from sklearn.cluster import KMeans
     import pandas as pd
     import numpy as np
-    import matplotlib.pyplot as plt
 
     # Escalar los datos si aún no lo has hecho
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(df[features])
 
     # Entrenar el modelo (usa el número de clusters que hayas elegido)
-    kmeans = KMeans(n_clusters=4, random_state=RANDOM_STATE)
+    kmeans = KMeans(n_clusters_analisis, random_state=RANDOM_STATE)
     kmeans.fit(X_scaled)
+    df['cluster'] = kmeans.labels_
+
+    # Agrupar por cluster y calcular la media de todas las features
+    df_cluster_summary = df.groupby('cluster')[features].mean()
+
+    # Mostrar las estadísticas promedio por cluster
+    print(df_cluster_summary)
+    # Plot del perfil del cluster 0
+    df_cluster_summary.loc[0].sort_values(ascending=False).plot(kind='barh', figsize=(8,10), title="Perfil del Cluster 0")
+    '''
+    for cluster_id in df_cluster_summary.index:
+        df_cluster_summary.loc[cluster_id].sort_values(ascending=False).plot(
+            kind='barh',
+            figsize=(8, 10),
+            title=f"Perfil del Cluster {cluster_id}"
+        )
+        plt.gca().invert_yaxis()
+        plt.tight_layout()
+        plt.show()
+    '''
+
+
 
     # Obtener los centroides
     centroids = pd.DataFrame(kmeans.cluster_centers_, columns=features)
@@ -98,9 +126,9 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
     variances = centroids.var().sort_values(ascending=False)
 
     # Mostrar las más importantes
-    print("Features más relevantes para el clustering:")
-    print(variances.head(10))
-    variances.head(10).plot(kind='barh', figsize=(8, 6), title="Importancia relativa de las features")
+    #print("Features más relevantes para el clustering:")
+    #print(variances.head(20))
+    variances.head(20).plot(kind='barh', figsize=(8, 6), title="Importancia relativa de las features")
     plt.gca().invert_yaxis()
     plt.tight_layout()
     plt.show()
@@ -111,11 +139,10 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
 
     # Carga de cada feature en los componentes principales
     pca_loadings = pd.Series(np.abs(pca.components_[0]), index=features)
-    print("Features con mayor carga en el primer componente:")
-    print(pca_loadings.sort_values(ascending=False).head(10))
+    #print("Features con mayor carga en el primer componente:")
+    #print(pca_loadings.sort_values(ascending=False).head(10))
     
     import pandas as pd
-    import matplotlib.pyplot as plt
     from sklearn.cluster import KMeans
     from sklearn.metrics import silhouette_score
 
@@ -156,7 +183,58 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
     plt.tight_layout()
     plt.show()
 
+    ###guardar caracteristicas analisis
+    import sys
+    import os
+    from contextlib import redirect_stdout
+    from pathlib import Path
 
+    # --- Configuración de parámetros ---
+    nombre_filtro = csv_file.stem.replace("resumen_consumos_", "")  # Extrae lo que sigue a 'resumen_consumos'
+    n_casos = len(df)  # Asumiendo que df tiene las 18 filas analizadas
+    nombre_log = f"{nombre_filtro}_k{n_clusters_analisis}_c{n_casos}.txt"
+
+    # Ruta donde guardar el archivo de log
+    ruta_log = Path("logs") / nombre_log  # Crea una carpeta 'logs'
+    ruta_log.parent.mkdir(exist_ok=True)  # Asegura que exista la carpeta
+
+    # --- Redirigir salida estándar a archivo ---
+    with open(ruta_log, 'w', encoding='utf-8') as f:
+        with redirect_stdout(f):
+
+            for n_clusters in range(2, 9):
+                clusters, _ = clustering(df, features, n_clusters, random_state=RANDOM_STATE)
+                label_column = f"{n_clusters}_clusters_label"
+                df[label_column] = clusters
+                groups = df.groupby(by=label_column)[archivo_column].unique()
+                print(f"KMeans(n_clusters={n_clusters}, random_state={RANDOM_STATE}) results:")
+                for cluster, value in groups.items():
+                    print(f"Cluster {cluster}: {", ".join(value)}")
+
+            # Aquí pones todo el análisis que quieras guardar:
+            # Mostrar todas las filas y columnas completas sin truncar
+            pd.set_option('display.max_rows', None)
+            pd.set_option('display.max_columns', None)
+            pd.set_option('display.width', None)  # para que no limite el ancho
+            pd.set_option('display.max_colwidth', None)  # mostrar columnas completas
+            print(f"\nPara {n_clusters_analisis} clusters las features mas importantes por cluster son:")
+            print(df_cluster_summary)
+            print("\nFeatures más relevantes para el clustering:")
+            print(variances.head(20))
+
+            print("\nFeatures con mayor carga en el primer componente:")
+            print(pca_loadings.sort_values(ascending=False).head(10))
+
+            print("\nSilhouette Scores por número de clusters:")
+            for k, score in zip(range_n_clusters, silhouette_scores):
+                print(f"k={k}: silhouette_score={score:.4f}")
+
+            print("\nInertias por número de clusters (codo):")
+            for k, inertia in zip(range_n_clusters, inertias):
+                print(f"k={k}: inertia={inertia:.2f}")
+
+    # --- Mostrar confirmación ---
+    print(f"Resultado guardado en {ruta_log}")
     
 
             
@@ -164,4 +242,5 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
 
 if __name__ == "__main__":
     #main(DATA_DIR / "dummy_data.csv")
-    main(DATA_DIR / "resumen_consumos.csv")
+    n_clusters_analisis = 4
+    main(DATA_DIR / "resumen_consumos_2023-03-01_a_2024-12-01.csv")

@@ -1,0 +1,95 @@
+KMeans(n_clusters=2, random_state=42) results:
+Cluster 0: ABLD, AJVG, ATF, GPC, JACL, JALG, JLG, LFZA, MBGV, RFM
+Cluster 1: FJAG, FMB, JMM, MANA, MTTA, PAA, RTF
+KMeans(n_clusters=3, random_state=42) results:
+Cluster 0: ABLD, ATF, GPC, JACL, JALG, JLG, LFZA, MBGV, RFM
+Cluster 1: AJVG, FMB, MANA, MTTA, PAA, RTF
+Cluster 2: FJAG, JMM
+KMeans(n_clusters=4, random_state=42) results:
+Cluster 0: JACL, JLG, RFM
+Cluster 1: FMB, MANA, MTTA, PAA, RTF
+Cluster 2: FJAG, JMM
+Cluster 3: ABLD, AJVG, ATF, GPC, JALG, LFZA, MBGV
+KMeans(n_clusters=5, random_state=42) results:
+Cluster 0: JACL, JLG, RFM
+Cluster 1: FMB, MANA, MTTA, RTF
+Cluster 2: FJAG
+Cluster 3: ABLD, AJVG, ATF, GPC, JALG, LFZA, MBGV
+Cluster 4: JMM, PAA
+KMeans(n_clusters=6, random_state=42) results:
+Cluster 0: JACL, JLG, RFM
+Cluster 1: MANA, MTTA, RTF
+Cluster 2: FJAG
+Cluster 3: ABLD, AJVG, ATF, GPC, JALG, LFZA, MBGV
+Cluster 4: JMM, PAA
+Cluster 5: FMB
+KMeans(n_clusters=7, random_state=42) results:
+Cluster 0: JACL, JLG, RFM
+Cluster 1: MANA, MTTA, RTF
+Cluster 2: FJAG
+Cluster 3: ABLD, AJVG, ATF, GPC, JALG, LFZA, MBGV
+Cluster 4: PAA
+Cluster 5: FMB
+Cluster 6: JMM
+KMeans(n_clusters=8, random_state=42) results:
+Cluster 0: JACL, JLG, RFM
+Cluster 1: RTF
+Cluster 2: FJAG
+Cluster 3: ABLD, ATF, GPC, JALG, LFZA, MBGV
+Cluster 4: JMM
+Cluster 5: FMB
+Cluster 6: AJVG, MANA, MTTA
+Cluster 7: PAA
+Features más relevantes para el clustering:
+Fin de semana    1.207420
+Sábado           1.187799
+Domingo          1.177320
+Lunes            1.168041
+media_consumo    1.131349
+Noche            1.120518
+Martes           1.103468
+Entre semana     1.072528
+Jueves           1.028000
+Miércoles        1.016158
+Tarde            0.841239
+Mediodia         0.806174
+Mañana           0.722802
+max_consumo      0.711711
+Viernes          0.654513
+std_consumo      0.654071
+Madrugada        0.592429
+min_consumo      0.389207
+dtype: float64
+
+Features con mayor carga en el primer componente:
+media_consumo    0.260951
+Entre semana     0.258620
+Miércoles        0.258466
+Martes           0.258235
+Jueves           0.257552
+Fin de semana    0.250942
+Sábado           0.248312
+Mediodia         0.248132
+Domingo          0.247279
+Noche            0.245835
+dtype: float64
+
+Silhouette Scores por número de clusters:
+k=2: silhouette_score=0.4812
+k=3: silhouette_score=0.4728
+k=4: silhouette_score=0.4869
+k=5: silhouette_score=0.4167
+k=6: silhouette_score=0.3624
+k=7: silhouette_score=0.3752
+k=8: silhouette_score=0.3033
+k=9: silhouette_score=0.2909
+
+Inertias por número de clusters (codo):
+k=2: inertia=8.88
+k=3: inertia=3.45
+k=4: inertia=2.10
+k=5: inertia=1.42
+k=6: inertia=1.19
+k=7: inertia=0.72
+k=8: inertia=0.56
+k=9: inertia=0.38

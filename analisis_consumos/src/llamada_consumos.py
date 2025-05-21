@@ -48,10 +48,15 @@ for archivo in archivos:
     
     import caracteristicas_consumo
     
+    filtro = "fechas"
+    #filtro = "completo"
+    #filtro = "mes"
+    #filtro = "estacion"
+
+
     # Llamar a la función para extraer características del consumo
-    resultado = caracteristicas_consumo.caracteristicas_consumo(ruta_completa)
+    df_resultado, nombre_filtro = caracteristicas_consumo.caracteristicas_consumo(ruta_completa,filtro)
     
-    df_resultado = resultado
     # Extraer la parte del nombre del archivo que empieza con 'ES0031' y termina antes del primer punto '.'
     match = re.search(r"^[A-Z]+", archivo)
     if match:
@@ -66,5 +71,7 @@ for archivo in archivos:
     df_resultados = pd.concat([df_resultados, df_resultado], ignore_index=True)
 
 # Guardar el DataFrame final a un CSV
-ruta_completa_archivo = carpeta_now / "data/viviendas/resumen_consumos.csv"
+nombre_archivo = f"resumen_consumos_{nombre_filtro}.csv"
+ruta_completa = carpeta_now / "data/viviendas"
+ruta_completa_archivo = ruta_completa / nombre_archivo
 df_resultados.to_csv(ruta_completa_archivo, index=False)
