@@ -80,7 +80,6 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
         "std_Mañana","std_Mediodia","std_Tarde","std_Noche","std_Madrugada","std_Lunes","std_Martes","std_Miércoles","std_Jueves","std_Viernes"
         ,"std_Sábado","std_Domingo","std_Entre semana","std_Fin de semana","std_invierno","std_otoño","std_primavera","std_verano",
         "Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
-        
     ]
 
     
@@ -97,6 +96,12 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
     kmeans = KMeans(n_clusters_analisis, random_state=RANDOM_STATE)
     kmeans.fit(X_scaled)
     df['cluster'] = kmeans.labels_
+    print("\n[INFO] Viviendas por cluster:")
+    grupos = df.groupby('cluster')['archivo'].unique()
+    for cluster_id, archivos in grupos.items():
+        print(f"Cluster {cluster_id} ({len(archivos)} viviendas): {', '.join(archivos)}")
+    print("\n[DEBUG] Media de consumo y número de casos por cluster:")
+    print(df.groupby('cluster')['media_consumo'].agg(['mean', 'count']))
 
     # Agrupar por cluster y calcular la media de todas las features
     df_cluster_summary = df.groupby('cluster')[features].mean()
@@ -201,15 +206,10 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
     # --- Redirigir salida estándar a archivo ---
     with open(ruta_log, 'w', encoding='utf-8') as f:
         with redirect_stdout(f):
-
-            for n_clusters in range(2, 9):
-                clusters, _ = clustering(df, features, n_clusters, random_state=RANDOM_STATE)
-                label_column = f"{n_clusters}_clusters_label"
-                df[label_column] = clusters
-                groups = df.groupby(by=label_column)[archivo_column].unique()
-                print(f"KMeans(n_clusters={n_clusters}, random_state={RANDOM_STATE}) results:")
-                for cluster, value in groups.items():
-                    print(f"Cluster {cluster}: {", ".join(value)}")
+            print("\n🏠 Viviendas por cluster:")
+            grupos = df.groupby('cluster')['archivo'].unique()
+            for cluster_id, archivos in grupos.items():
+                print(f"Cluster {cluster_id} ({len(archivos)} viviendas): {', '.join(archivos)}")
 
             # Aquí pones todo el análisis que quieras guardar:
             # Mostrar todas las filas y columnas completas sin truncar

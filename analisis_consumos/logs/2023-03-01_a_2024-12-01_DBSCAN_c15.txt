@@ -1,0 +1,58 @@
+
+DBSCAN eps=2:
+- Clusters encontrados: 0
+- Puntos de ruido: 15
+- Silhouette Score: N/A
+Cluster -1: ABLD, AJVG, FJAG, FMB, GPC, JACL, JALG, JLG, JMM, LFZA, MANA, MBGV, PAA, RFM, RTF
+
+Promedios por cluster:
+              media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  ...       Julio    Agosto  Septiembre     Octubre   Noviembre   Diciembre
+dbscan_eps_2                                                                                                    ...                                                                      
+-1                 0.222813     0.267974        0.023     2.883667                0.0857              0.131333  ...  330.706267  337.9594  284.669933  299.902267  315.559867  170.713533
+
+[1 rows x 72 columns]
+
+DBSCAN eps=4:
+- Clusters encontrados: 1
+- Puntos de ruido: 11
+- Silhouette Score: N/A
+Cluster -1: AJVG, FJAG, JACL, JALG, JLG, JMM, LFZA, MANA, PAA, RFM, RTF
+Cluster 0: ABLD, FMB, GPC, MBGV
+
+Promedios por cluster:
+              media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  ...       Julio      Agosto  Septiembre     Octubre   Noviembre   Diciembre
+dbscan_eps_4                                                                                                    ...                                                                        
+-1                 0.236238     0.290635     0.021727     3.003636              0.091636              0.139364  ...  363.340636  373.559273  296.851364  305.489636  330.364818  179.570909
+ 0                 0.185893     0.205655     0.026500     2.553750              0.069375              0.109250  ...  240.961750  240.059750  251.171000  284.537000  274.846250  146.355750
+
+[2 rows x 72 columns]
+
+DBSCAN eps=6:
+- Clusters encontrados: 1
+- Puntos de ruido: 2
+- Silhouette Score: N/A
+Cluster -1: AJVG, FJAG
+Cluster 0: ABLD, FMB, GPC, JACL, JALG, JLG, JMM, LFZA, MANA, MBGV, PAA, RFM, RTF
+
+Promedios por cluster:
+              media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  ...       Julio      Agosto  Septiembre     Octubre   Noviembre   Diciembre
+dbscan_eps_6                                                                                                    ...                                                                        
+-1                 0.334186     0.530914     0.026500     4.673500              0.112000              0.164000  ...  502.717000  472.588500  424.372000  395.160000  462.898500  271.525000
+ 0                 0.205678     0.227521     0.022462     2.608308              0.081654              0.126308  ...  304.243077  317.247231  263.177308  285.247231  292.892385  155.204077
+
+[2 rows x 72 columns]
+
+DBSCAN eps=8:
+- Clusters encontrados: 1
+- Puntos de ruido: 1
+- Silhouette Score: N/A
+Cluster -1: FJAG
+Cluster 0: ABLD, AJVG, FMB, GPC, JACL, JALG, JLG, JMM, LFZA, MANA, MBGV, PAA, RFM, RTF
+
+Promedios por cluster:
+              media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  ...       Julio      Agosto  Septiembre     Octubre   Noviembre   Diciembre
+dbscan_eps_8                                                                                                    ...                                                                        
+-1                 0.454816     0.726417     0.048000     5.326000              0.173000              0.250000  ...  809.396000  795.986000  634.770000  550.252000  587.373000  293.894000
+ 0                 0.206241     0.235228     0.021214     2.709214              0.079464              0.122857  ...  296.514143  305.243214  259.662786  282.020143  296.144643  161.914929
+
+[2 rows x 72 columns]

@@ -1,0 +1,13 @@
+Modelo;Cluster;Perfil;Variables_clave
+Agglomerative;0;Consumo medio-bajo, regular y estable;['media_consumo', 'sum_consumo', 'Noche']
+Agglomerative;1;Consumo medio-alto, con uso fuerte por la tarde y noche, estacional;['media_consumo', 'Tarde', 'Noche', 'sum_consumo']
+Agglomerative;2;Consumo muy alto, disperso durante el día y la semana;['sum_consumo', 'media_consumo', 'std_consumo']
+Agglomerative;3;Consumo muy bajo y extremadamente estable;['media_consumo', 'std_consumo', 'sum_consumo']
+GMM;0;Consumo muy bajo, similar al Agg 3 / KMeans 0;['media_consumo', 'sum_consumo']
+GMM;1;Consumo medio-alto, estacional, preferencia tarde/noche;['Tarde', 'sum_consumo', 'media_consumo']
+GMM;2;Consumo muy alto, comportamiento disperso;['sum_consumo', 'media_consumo', 'std_consumo']
+GMM;3;Consumo medio, regular, ligeramente nocturno;['media_consumo', 'sum_consumo', 'Noche']
+KMeans;0;Consumo muy bajo y estable (similar a Agg 3 / GMM 0);['media_consumo', 'sum_consumo']
+KMeans;1;Consumo medio-alto, tarde/noche, estacional;['sum_consumo', 'Tarde', 'media_consumo']
+KMeans;2;Consumo extremo, muy disperso y variable;['sum_consumo', 'std_consumo', 'media_consumo']
+KMeans;3;Consumo medio-bajo, comportamiento regular;['media_consumo', 'sum_consumo', 'Noche']
