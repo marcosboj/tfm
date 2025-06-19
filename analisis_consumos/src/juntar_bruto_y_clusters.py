@@ -52,7 +52,7 @@ for file in DIR_CONSUMOS.glob("*_Consumos_????-??_????-??_*"):
             carpeta_cluster = DIR_SALIDA_BASE / f"cluster_{n_clusters}"
             carpeta_cluster.mkdir(exist_ok=True)
 
-            nombre_archivo = f"{vivienda}_{año}_{mes:02}_cluster_k{n_clusters}.csv"
+            nombre_archivo = f"{vivienda}_{año}_{mes:02}_cluster_k{n_clusters}_id_{cluster_id}.csv"
             ruta_archivo = carpeta_cluster / nombre_archivo
             df_mes_copia.to_csv(ruta_archivo, sep=";", index=False)
             print(f"✅ Guardado: {ruta_archivo.relative_to(DIR_SALIDA_BASE)}")
