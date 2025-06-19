@@ -1,0 +1,46 @@
+[INFO] Features en el DataFrame: ['media_consumo', 'std_consumo', 'min_consumo', 'max_consumo', 'percentil_25_consumo', 'percentil_50_consumo', 'percentil_75_consumo', 'promedio_por_dia', 'consumo_medio_diario', 'Mañana', 'Mediodia', 'Tarde', 'Noche', 'Madrugada', 'sum_consumo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo', 'Entre semana', 'Fin de semana', 's_Mañana', 's_Mediodia', 's_Tarde', 's_Noche', 's_Madrugada', 's_Lunes', 's_Martes', 's_Miércoles', 's_Jueves', 's_Viernes', 's_Sábado', 's_Domingo', 's_Entre semana', 's_Fin de semana', 's_primavera', 'std_Mañana', 'std_Mediodia', 'std_Tarde', 'std_Noche', 'std_Madrugada', 'std_Lunes', 'std_Martes', 'std_Miércoles', 'std_Jueves', 'std_Viernes', 'std_Sábado', 'std_Domingo', 'std_Entre semana', 'std_Fin de semana', 'std_primavera', 'Marzo', 'Abril', 'Mayo']
+[INFO] Clustering Agglomerative para archivo: resumen_consumos_estacion_primavera.csv
+[INFO] Dendrograma guardado en resultados\estacion_primavera_dendrograma_k4_c15.png
+
+Resumen por cluster (Agglomerative):
+             media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  percentil_75_consumo  promedio_por_dia  consumo_medio_diario    Mañana  Mediodia     Tarde     Noche  Madrugada  sum_consumo     Lunes    Martes  Miércoles    Jueves   Viernes    Sábado   Domingo  Entre semana  Fin de semana    s_Mañana  s_Mediodia     s_Tarde     s_Noche  s_Madrugada     s_Lunes    s_Martes  s_Miércoles    s_Jueves   s_Viernes    s_Sábado   s_Domingo  s_Entre semana  s_Fin de semana  s_primavera  std_Mañana  std_Mediodia  std_Tarde  std_Noche  std_Madrugada  std_Lunes  std_Martes  std_Miércoles  std_Jueves  std_Viernes  std_Sábado  std_Domingo  std_Entre semana  std_Fin de semana  std_primavera       Marzo       Abril        Mayo
+agg_cluster                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+0                 0.259078     0.281322       0.0290       2.8700              0.089833              0.144667              0.313125          0.259093              5.955984  0.213756  0.321865  0.269964  0.367993   0.123849  1095.901000  0.268755  0.273547   0.275670  0.263011  0.246880  0.237573  0.247905      0.265508       0.242730  157.324167  355.339000  198.693833  270.842667   113.701333  160.715333  163.580833   171.191167  157.280833  153.312667  142.068500  147.751667      806.080833       289.820167  1095.901000    0.108983      0.071405   0.033664   0.074627       0.031303   0.278550    0.286026       0.297859    0.278879     0.262898    0.266167     0.269789          0.282724           0.269700       0.281322  414.310167  346.487000  335.103833
+1                 0.185654     0.215042       0.0252       2.1814              0.066400              0.109200              0.201800          0.185637              4.268024  0.137816  0.206233  0.228813  0.249016   0.113849   785.316400  0.183000  0.195155   0.187544  0.183184  0.176327  0.183162  0.191512      0.184995       0.187330  101.432400  227.681200  168.406600  183.275800   104.520400  109.434000  116.702800   116.464600  109.544200  109.499000  109.530800  114.141000      561.644600       223.671800   785.316400    0.070041      0.051718   0.033852   0.049196       0.051542   0.200727    0.220931       0.210522    0.213392     0.203172    0.214980     0.232832          0.210551           0.224525       0.215042  282.086600  243.512400  259.717400
+2                 0.384158     0.613857       0.0480       5.1930              0.162000              0.236500              0.374000          0.384160              8.831451  0.218154  0.585909  0.448690  0.472643   0.151913  1624.987000  0.304472  0.285548   0.388549  0.396841  0.525905  0.325236  0.457176      0.381429       0.391095  160.561000  646.844000  330.236000  347.865000   139.481000  182.074000  170.758000   241.289000  237.311000  326.587000  194.491000  272.477000     1158.019000       466.968000  1624.987000    0.059856      0.203929   0.141271   0.112213       0.039787   0.213383    0.190442       0.614503    0.623655     0.989253    0.279648     0.817389          0.613971           0.613769       0.613857  497.684000  547.235000  580.068000
+3                 0.110940     0.087389       0.0160       1.0800              0.067000              0.087333              0.125000          0.110934              2.550406  0.089436  0.133766  0.111721  0.132110   0.083111   469.274667  0.112866  0.110368   0.108884  0.113669  0.109802  0.112970  0.108131      0.111091       0.110555   65.825000  147.677333   82.226667   97.233000    76.312667   67.494000   66.000333    67.616667   67.974000   68.187333   67.556333   64.446000      337.272333       132.002333   469.274667    0.028804      0.037510   0.031240   0.016133       0.011668   0.082033    0.080878       0.077402    0.098192     0.087412    0.095978     0.082587          0.085605           0.090331       0.087389  161.425667  146.207333  161.641667
+[INFO] Gráfico de clusters guardado en resultados\estacion_primavera_clusters_k4_c15.png
+
+Casos por cluster:
+Cluster 0: AJVG, JALG, JMM, MANA, PAA, RTF
+Cluster 1: ABLD, FMB, GPC, LFZA, MBGV
+Cluster 2: FJAG
+Cluster 3: JACL, JLG, RFM
+
+[INFO] Número de clusters sugerido (dendrograma): 4
+
+🔎 Features más influyentes en PC1:
+consumo_medio_diario    0.151778
+s_primavera             0.151778
+sum_consumo             0.151778
+media_consumo           0.151778
+promedio_por_dia        0.151777
+Entre semana            0.149895
+s_Entre semana          0.149895
+Abril                   0.149861
+Miércoles               0.149667
+s_Miércoles             0.149667
+dtype: float64
+
+🔎 Features más influyentes en PC2:
+std_Mañana              0.343488
+std_Lunes               0.321625
+std_Martes              0.308959
+Mañana                  0.274281
+s_Mañana                0.274281
+percentil_25_consumo    0.244090
+std_Tarde               0.243403
+min_consumo             0.214698
+percentil_50_consumo    0.181804
+std_Mediodia            0.166308
+dtype: float64

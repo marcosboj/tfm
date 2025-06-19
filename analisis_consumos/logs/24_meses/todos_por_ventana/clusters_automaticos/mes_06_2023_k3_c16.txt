@@ -1,0 +1,69 @@
+[INFO] Features utilizadas en el DataFrame: ['media_consumo', 'std_consumo', 'min_consumo', 'max_consumo', 'percentil_25_consumo', 'percentil_50_consumo', 'percentil_75_consumo', 'promedio_por_dia', 'consumo_medio_diario', 'Mañana', 'Mediodia', 'Tarde', 'Noche', 'Madrugada', 'sum_consumo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo', 'Entre semana', 'Fin de semana', 's_Mañana', 's_Mediodia', 's_Tarde', 's_Noche', 's_Madrugada', 's_Lunes', 's_Martes', 's_Miércoles', 's_Jueves', 's_Viernes', 's_Sábado', 's_Domingo', 's_Entre semana', 's_Fin de semana', 's_verano', 'std_Mañana', 'std_Mediodia', 'std_Tarde', 'std_Noche', 'std_Madrugada', 'std_Lunes', 'std_Martes', 'std_Miércoles', 'std_Jueves', 'std_Viernes', 'std_Sábado', 'std_Domingo', 'std_Entre semana', 'std_Fin de semana', 'std_verano', 'Junio']
+
+🏘 Viviendas por cluster:
+Cluster 0 (8 viviendas): ABLD, AJVG, FMB, GPC, JACL, JLG, LFZA, RFM
+Cluster 1 (7 viviendas): JALG, JMM, MANA, MBGV, MTTA, PAA, RTF
+Cluster 2 (1 viviendas): FJAG
+
+Para 3 clusters, las medias por cluster son:
+         media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  percentil_75_consumo  promedio_por_dia  consumo_medio_diario    Mañana  Mediodia     Tarde     Noche  Madrugada  sum_consumo     Lunes    Martes  Miércoles    Jueves   Viernes    Sábado   Domingo  Entre semana  Fin de semana   s_Mañana  s_Mediodia    s_Tarde   s_Noche  s_Madrugada  s_Lunes   s_Martes  s_Miércoles   s_Jueves  s_Viernes   s_Sábado  s_Domingo  s_Entre semana  s_Fin de semana    s_verano  std_Mañana  std_Mediodia  std_Tarde  std_Noche  std_Madrugada  std_Lunes  std_Martes  std_Miércoles  std_Jueves  std_Viernes  std_Sábado  std_Domingo  std_Entre semana  std_Fin de semana  std_verano       Junio
+cluster                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+0             0.148913     0.149919     0.026625     1.431250              0.070250              0.101562              0.168625          0.148913              3.425008  0.128454  0.146628  0.176458  0.197406   0.107193   102.750250  0.152043  0.152707   0.152943  0.151141  0.139035  0.143838  0.152599      0.149166       0.148219  15.414500   26.393000  21.175000  23.68875    16.079000   13.988  14.049000     14.07075  17.381250     15.989  13.233125  14.039125       75.478000        27.272250  102.750250    0.049404      0.056471   0.061764   0.059707       0.039929   0.133696    0.150269       0.159060    0.138828     0.125377    0.137329     0.171906          0.145031           0.161276    0.149919  102.750250
+1             0.245146     0.229073     0.068714     2.005857              0.115071              0.169143              0.277429          0.245146              5.638362  0.180774  0.283764  0.260918  0.326633   0.172495   169.150857  0.264967  0.256998   0.240750  0.237804  0.224383  0.230003  0.268144      0.243718       0.249074  21.692857   51.077571  31.310143  39.19600    25.874286   24.377  23.643857     22.14900  27.347429     25.804  21.160286  24.669286      123.321286        45.829571  169.150857    0.071878      0.115302   0.071861   0.075928       0.052290   0.248447    0.209431       0.210841    0.197041     0.186963    0.210221     0.267777          0.215735           0.246066    0.229073  169.150857
+2             0.454190     0.741006     0.070000     5.210000              0.193000              0.278500              0.411750          0.454190             10.446367  0.292283  0.668372  0.586217  0.481767   0.199013   313.391000  0.889924  0.316989   0.310511  0.328713  0.536583  0.321837  0.485543      0.472553       0.403690  35.074000  120.307000  70.346000  57.81200    29.852000   81.873  29.163000     28.56700  37.802000     61.707  29.609000  44.670000      239.112000        74.279000  313.391000    0.315467      0.162608   0.045325   0.092112       0.044173   1.536327    0.176489       0.161495    0.201199     0.909393    0.185835     0.582729          0.823428           0.439053    0.741006  313.391000
+
+🔥 Variables más importantes para el clustering (varianza entre centroides):
+std_Lunes               5.297308
+std_Entre semana        5.120113
+std_Viernes             5.092975
+std_verano              5.044526
+std_consumo             5.044526
+Lunes                   4.838497
+s_Lunes                 4.838497
+max_consumo             4.641565
+s_Tarde                 4.274238
+Tarde                   4.274238
+s_Viernes               4.135796
+Viernes                 4.135796
+s_Mediodia              3.922706
+Mediodia                3.922706
+std_Mañana              3.567543
+s_Entre semana          3.548137
+Entre semana            3.548137
+consumo_medio_diario    3.509398
+sum_consumo             3.509398
+s_verano                3.509398
+dtype: float64
+
+💡 Features con mayor carga en el primer componente PCA:
+promedio_por_dia        0.159137
+consumo_medio_diario    0.159137
+sum_consumo             0.159137
+Junio                   0.159137
+s_verano                0.159137
+media_consumo           0.159137
+s_Entre semana          0.157187
+Entre semana            0.157187
+s_Viernes               0.154754
+Viernes                 0.154754
+dtype: float64
+
+📈 Silhouette Scores por número de clusters:
+k=2: silhouette_score=0.5603
+k=3: silhouette_score=0.5768
+k=4: silhouette_score=0.4137
+k=5: silhouette_score=0.4421
+k=6: silhouette_score=0.4411
+k=7: silhouette_score=0.4068
+k=8: silhouette_score=0.3692
+k=9: silhouette_score=0.2997
+
+📉 Inertias por número de clusters (método del codo):
+k=2: inertia=84487.33
+k=3: inertia=22961.45
+k=4: inertia=12745.35
+k=5: inertia=7745.80
+k=6: inertia=4268.79
+k=7: inertia=3171.19
+k=8: inertia=2320.98
+k=9: inertia=1641.10

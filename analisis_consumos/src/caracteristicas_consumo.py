@@ -63,9 +63,9 @@ def caracteristicas_consumo(csv, filtro="completo"):
                 (datos_consumo["timestamp"].dt.month == mes) &
                 (datos_consumo["timestamp"].dt.year == año)
             ]
-            nombre_filtro = f"mes_{mes:02d}"
+            nombre_filtro = f"mes_{mes:02d}_{año}"
         case "estacion":
-            estacion = "otoño"
+            estacion = "verano"
             datos_consumo["estacion"] = datos_consumo["timestamp"].dt.month.map(
                 lambda x: "invierno" if x in [12, 1, 2] else
                           "primavera" if x in [3, 4, 5] else

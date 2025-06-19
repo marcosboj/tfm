@@ -52,35 +52,21 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
 
     # Clustering
     archivo_column: str = "archivo"
-    '''
-    features = [
-        "media_consumo", "std_consumo", "min_consumo", "max_consumo", "percentil_25_consumo", "percentil_50_consumo",
-        "percentil_75_consumo","consumo_1.0","consumo_2.0","consumo_3.0","consumo_4.0","consumo_5.0","consumo_6.0",
-        "consumo_7.0","consumo_8.0","consumo_9.0","consumo_10.0","consumo_11.0","consumo_12.0","consumo_13.0",
-        "consumo_14.0","consumo_15.0","consumo_16.0","consumo_17.0","consumo_18.0","consumo_19.0","consumo_20.0",
-        "consumo_21.0","consumo_22.0","consumo_23.0","Mañana","Tarde","Noche","Madrugada","Lunes","Martes","Miércoles"
-        ,"Jueves","Viernes","Sábado","Domingo","Entre semana","Fin de semana"
-        
-    ]
-    
-    features = [
-        "media_consumo", "std_consumo", "min_consumo", "max_consumo", "percentil_25_consumo", "percentil_50_consumo",
-        "percentil_75_consumo","Mañana","Tarde","Noche","Madrugada","Lunes","Martes","Miércoles"
-        ,"Jueves","Viernes","Sábado","Domingo","Entre semana","Fin de semana"
-        
-    ]
-    '''
+
     features = [
         "media_consumo", "std_consumo", "min_consumo", "max_consumo", "percentil_25_consumo", "percentil_50_consumo",
         "percentil_75_consumo","promedio_por_dia","consumo_medio_diario",
         "Mañana","Mediodia", "Tarde","Noche","Madrugada","sum_consumo",
         "Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo","Entre semana","Fin de semana",
-        "s_Mañana","s_Mediodia","s_Tarde","s_Noche","s_Madrugada","s_Lunes","s_Martes","s_Miércoles","s_Jueves","s_Viernes"
-        ,"s_Sábado","s_Domingo","s_Entre semana","s_Fin de semana","s_invierno","s_otoño","s_primavera","s_verano",
-        "std_Mañana","std_Mediodia","std_Tarde","std_Noche","std_Madrugada","std_Lunes","std_Martes","std_Miércoles","std_Jueves","std_Viernes"
-        ,"std_Sábado","std_Domingo","std_Entre semana","std_Fin de semana","std_invierno","std_otoño","std_primavera","std_verano",
+        "s_Mañana","s_Mediodia","s_Tarde","s_Noche","s_Madrugada","s_Lunes","s_Martes","s_Miércoles","s_Jueves","s_Viernes",
+        "s_Sábado","s_Domingo","s_Entre semana","s_Fin de semana","s_invierno","s_otoño","s_primavera","s_verano",
+        "std_Mañana","std_Mediodia","std_Tarde","std_Noche","std_Madrugada","std_Lunes","std_Martes","std_Miércoles","std_Jueves","std_Viernes",
+        "std_Sábado","std_Domingo","std_Entre semana","std_Fin de semana","std_invierno","std_otoño","std_primavera","std_verano",
         "Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
     ]
+    # Elimina features que no están presentes en el DataFrame (por rango temporal)
+    features = [f for f in features if f in df.columns]
+    print(f"[INFO] Features en el DataFrame: {features}")
 
     
     from sklearn.preprocessing import StandardScaler
@@ -206,6 +192,7 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
     # --- Redirigir salida estándar a archivo ---
     with open(ruta_log, 'w', encoding='utf-8') as f:
         with redirect_stdout(f):
+            print(f"[INFO] Features en el DataFrame: {features}")
             print("\n🏠 Viviendas por cluster:")
             grupos = df.groupby('cluster')['archivo'].unique()
             for cluster_id, archivos in grupos.items():
@@ -243,4 +230,4 @@ def main(csv_file: Path, datetime_column: str = "datetime"):
 if __name__ == "__main__":
     #main(DATA_DIR / "dummy_data.csv")
     n_clusters_analisis = 4
-    main(DATA_DIR / "resumen_consumos_2023-03-01_a_2024-12-01.csv")
+    main(DATA_DIR / "resumen_consumos_mes_10.csv")

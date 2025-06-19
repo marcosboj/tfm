@@ -1,0 +1,67 @@
+[INFO] Features utilizadas en el DataFrame: ['media_consumo', 'std_consumo', 'min_consumo', 'max_consumo', 'percentil_25_consumo', 'percentil_50_consumo', 'percentil_75_consumo', 'promedio_por_dia', 'consumo_medio_diario', 'Mañana', 'Mediodia', 'Tarde', 'Noche', 'Madrugada', 'sum_consumo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo', 'Entre semana', 'Fin de semana', 's_Mañana', 's_Mediodia', 's_Tarde', 's_Noche', 's_Madrugada', 's_Lunes', 's_Martes', 's_Miércoles', 's_Jueves', 's_Viernes', 's_Sábado', 's_Domingo', 's_Entre semana', 's_Fin de semana', 's_verano', 'std_Mañana', 'std_Mediodia', 'std_Tarde', 'std_Noche', 'std_Madrugada', 'std_Lunes', 'std_Martes', 'std_Miércoles', 'std_Jueves', 'std_Viernes', 'std_Sábado', 'std_Domingo', 'std_Entre semana', 'std_Fin de semana', 'std_verano', 'Julio']
+
+🏘 Viviendas por cluster:
+Cluster 0 (13 viviendas): ABLD, AJVG, FMB, GPC, JACL, JALG, JLG, JMM, MANA, MBGV, PAA, RFM, RTF
+Cluster 1 (1 viviendas): MTTA
+
+Para 2 clusters, las medias por cluster son:
+         media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  percentil_75_consumo  promedio_por_dia  consumo_medio_diario    Mañana  Mediodia     Tarde     Noche  Madrugada  sum_consumo     Lunes    Martes  Miércoles    Jueves   Viernes    Sábado   Domingo  Entre semana  Fin de semana   s_Mañana  s_Mediodia    s_Tarde    s_Noche  s_Madrugada    s_Lunes  s_Martes  s_Miércoles   s_Jueves  s_Viernes   s_Sábado  s_Domingo  s_Entre semana  s_Fin de semana    s_verano  std_Mañana  std_Mediodia  std_Tarde  std_Noche  std_Madrugada  std_Lunes  std_Martes  std_Miércoles  std_Jueves  std_Viernes  std_Sábado  std_Domingo  std_Entre semana  std_Fin de semana  std_verano       Julio
+cluster                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+0             0.194392     0.195378     0.055615        1.570              0.089077              0.126077              0.214385          0.194392              4.471007  0.135198  0.224843  0.247228  0.244705   0.122685   138.601231  0.199198  0.231772   0.202549  0.202264  0.185823  0.167714  0.180389      0.204077       0.174052  16.764538   41.820846  30.656308  30.343385    19.016154  22.907769    21.323    18.634538  18.608308  17.095692  19.287154  20.744769       98.569308        40.031923  138.601231    0.054989      0.090236   0.058986   0.048016       0.033048   0.193748    0.224709       0.192759    0.188540     0.168431    0.159060     0.182316          0.199173           0.175088    0.195378  138.601231
+1             0.490492     0.535106     0.074000        3.127              0.157000              0.251000              0.603000          0.490492             11.281323  0.188685  0.629812  0.625427  0.642339   0.335329   349.721000  0.477217  0.685533   0.478880  0.419326  0.458065  0.448087  0.482304      0.502538       0.465196  23.397000  117.145000  77.553000  79.650000    51.976000  54.880000    63.069    44.057000  38.578000  42.142000  51.530000  55.465000      242.726000       106.995000  349.721000    0.007051      0.124259   0.047742   0.267015       0.076062   0.459346    0.721121       0.469390    0.344707     0.541923    0.565099     0.547693          0.525270           0.555513    0.535106  349.721000
+
+🔥 Variables más importantes para el clustering (varianza entre centroides):
+std_Noche               5.408544
+std_Fin de semana       5.106412
+Martes                  5.089419
+s_Martes                5.089419
+s_Madrugada             5.083622
+Madrugada               5.083622
+std_Sábado              4.807109
+std_Domingo             4.772398
+Noche                   4.632919
+s_Noche                 4.632919
+std_Martes              4.443335
+consumo_medio_diario    4.434571
+media_consumo           4.434571
+s_verano                4.434571
+Julio                   4.434571
+sum_consumo             4.434571
+promedio_por_dia        4.434571
+std_consumo             4.415525
+std_verano              4.415525
+Lunes                   4.379748
+dtype: float64
+
+💡 Features con mayor carga en el primer componente PCA:
+consumo_medio_diario    0.151931
+Julio                   0.151931
+s_verano                0.151931
+sum_consumo             0.151931
+media_consumo           0.151931
+promedio_por_dia        0.151931
+Noche                   0.151381
+s_Noche                 0.151381
+s_Entre semana          0.151064
+Entre semana            0.151064
+dtype: float64
+
+📈 Silhouette Scores por número de clusters:
+k=2: silhouette_score=0.6298
+k=3: silhouette_score=0.5738
+k=4: silhouette_score=0.4931
+k=5: silhouette_score=0.4279
+k=6: silhouette_score=0.3419
+k=7: silhouette_score=0.3488
+k=8: silhouette_score=0.2851
+k=9: silhouette_score=0.2271
+
+📉 Inertias por número de clusters (método del codo):
+k=2: inertia=119840.97
+k=3: inertia=28754.74
+k=4: inertia=19015.27
+k=5: inertia=8494.42
+k=6: inertia=6274.33
+k=7: inertia=2862.94
+k=8: inertia=2029.51
+k=9: inertia=1548.45

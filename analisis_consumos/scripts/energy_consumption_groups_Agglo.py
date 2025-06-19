@@ -121,6 +121,9 @@ def main(csv_file: Path, datetime_column: str = "datetime", n_clusters: Optional
         "std_Sábado","std_Domingo","std_Entre semana","std_Fin de semana","std_invierno","std_otoño","std_primavera","std_verano",
         "Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
     ]
+        # Elimina features que no están presentes en el DataFrame (por rango temporal)
+    features = [f for f in features if f in df.columns]
+    print(f"[INFO] Features en el DataFrame: {features}")
 
 
     # Escalar
@@ -155,6 +158,7 @@ def main(csv_file: Path, datetime_column: str = "datetime", n_clusters: Optional
             pd.set_option('display.max_columns', None)
             pd.set_option('display.width', None)
             pd.set_option('display.max_colwidth', None)
+            print(f"[INFO] Features en el DataFrame: {features}")
             print(f"[INFO] Clustering Agglomerative para archivo: {csv_file.name}")
             df, summary = aplicar_agglomerative(df, features, n_clusters=n_clusters_usado, csv_file=csv_file)
             #df, summary = aplicar_agglomerative(df, features, n_clusters=n_clusters_sugerido, csv_file=csv_file)
@@ -180,4 +184,4 @@ def main(csv_file: Path, datetime_column: str = "datetime", n_clusters: Optional
 
 
 if __name__ == "__main__":
-     main(DATA_DIR / "resumen_consumos_2023-03-01_a_2024-12-01.csv", n_clusters=4)
+     main(DATA_DIR / "resumen_consumos_mes_10.csv", n_clusters=4)
