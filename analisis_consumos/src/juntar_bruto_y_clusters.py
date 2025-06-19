@@ -47,6 +47,8 @@ for file in DIR_CONSUMOS.glob("*_Consumos_????-??_????-??_*"):
             colname = f"cluster_k{n_clusters}_{año}_{mes:02}"
             df_mes_copia = df_mes.copy()
             df_mes_copia[colname] = cluster_id
+            # Eliminar columnas auxiliares año y mes
+            df_mes_copia = df_mes_copia.drop(columns=["año", "mes"])
 
             # Crear subcarpeta según el número de clusters
             carpeta_cluster = DIR_SALIDA_BASE / f"cluster_{n_clusters}"
