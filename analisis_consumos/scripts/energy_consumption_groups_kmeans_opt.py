@@ -182,8 +182,10 @@ def main(
 if __name__ == "__main__":
     for file in DATA_DIR.glob("resumen_consumos_mes_*.csv"):
         print(f"\n📂 Procesando archivo: {file.name}")
-        main(
-            csv_file=file,
-            modo_manual=True,  # Cambia a True si quieres forzar el número de clusters
-            n_clusters_analisis=4  # Solo tiene efecto si modo_manual=True
-        )
+        for k in [2, 3, 4]:
+            print(f"\n🔢 Ejecutando clustering con k={k} clusters")
+            main(
+                csv_file=file,
+                modo_manual=True,       # Forzamos el modo manual
+                n_clusters_analisis=k   # Probamos con 2, 3 y 4 clusters
+            )
