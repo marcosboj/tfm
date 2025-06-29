@@ -1,3 +1,5 @@
+aiofiles
+aiohttp
 jupyterlab
 pandas
 scikit-learn

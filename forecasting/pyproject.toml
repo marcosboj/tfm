@@ -11,6 +11,8 @@ name = "tfm-forecasting"
 version = "0.1.0"
 requires-python = ">= 3.13"
 dependencies = [
+    "aiofiles>=24.1.0",
+    "aiohttp>=3.12.13",
     "pandas>=2.3.0",
     "scikit-learn>=1.7.0"
 ]
