@@ -1,11 +1,11 @@
 from enum import StrEnum
 
 
-class HouseholdColumns(StrEnum):
+class HousingUnitColumns(StrEnum):
     Date = "date"
     Time = "time"
     Consumption = "consumptionKWh"
 
 
-class AdditionalHouseholdFields(StrEnum):
+class AdditionalHousingUnitFields(StrEnum):
     Datetime = "datetime"
