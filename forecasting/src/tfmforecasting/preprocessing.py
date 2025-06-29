@@ -4,7 +4,7 @@ from tfmforecasting.dataset import AdditionalHousingUnitFields, HousingUnitColum
 
 
 def name_lagged_feature(feature: HousingUnitColumns, lag: int) -> str:
-    return f"prev_{feature}_{lag:02d}"
+    return f"{feature}_{lag:02d}"
 
 
 def add_datetime_column(df: pd.DataFrame, tz: str = 'Europe/Madrid') -> pd.DataFrame:
@@ -18,7 +18,8 @@ def add_datetime_column(df: pd.DataFrame, tz: str = 'Europe/Madrid') -> pd.DataF
     parsed_df[datetime_column] = pd.to_datetime(parsed_df[HousingUnitColumns.Date])
     parsed_df[datetime_column] = parsed_df.apply(add_hour_to_datetime, axis=1)
     parsed_df[datetime_column] = parsed_df[datetime_column].dt.tz_localize(tz)
-    return parsed_df
+    parsed_df[datetime_column] = parsed_df[datetime_column].dt.tz_convert('UTC')
+    return parsed_df.sort_values(by=[datetime_column]).reset_index(drop=True)
 
 
 def lag_consumption_feature(df: pd.DataFrame, n_lags: int) -> pd.DataFrame:
