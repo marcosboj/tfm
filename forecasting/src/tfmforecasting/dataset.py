@@ -9,3 +9,4 @@ class HousingUnitColumns(StrEnum):
 
 class AdditionalHousingUnitFields(StrEnum):
     Datetime = "datetime"
+    HousingUnit = "housing_unit"
