@@ -4,7 +4,7 @@ from tfmforecasting.dataset import AdditionalHousingUnitFields, HousingUnitColum
 
 
 def name_lagged_feature(feature: HousingUnitColumns, lag: int) -> str:
-    return f"{feature}_{lag:02d}"
+    return f"lagged_{feature}_{lag:02d}h"
 
 
 def add_datetime_to_housing_unit_dataset(df: pd.DataFrame, tz: str = 'Europe/Madrid') -> pd.DataFrame:

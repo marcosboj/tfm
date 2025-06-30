@@ -1,6 +1,7 @@
 aiofiles
 aiohttp
 jupyterlab
+numpy
 pandas
 plotly
 scikit-learn

@@ -1,4 +1,3 @@
-# https://mandeo.meteogalicia.es/thredds/ncss/grid/modelos/WRF_HIST/d03/2012/02/wrf_arw_det_history_d03_20120215_0000.nc4
 from enum import StrEnum
 from datetime import datetime
 from pathlib import Path
@@ -24,7 +23,6 @@ class MeteoGaliciaWRFVar(StrEnum):
 class MeteoGaliciaNetCDFSubsetColumns(StrEnum):
     DATE = "date"
     TEMP = 'temp[unit="K"]'
-    TEMP_C = 'temp[unit="C"]'
     CFL = 'cfl[unit="1"]'
     CFM = 'cfm[unit="1"]'
     MOD = 'mod[unit="m s-1"]'
