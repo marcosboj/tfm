@@ -7,7 +7,7 @@ def name_lagged_feature(feature: HousingUnitColumns, lag: int) -> str:
     return f"{feature}_{lag:02d}"
 
 
-def add_datetime_column(df: pd.DataFrame, tz: str = 'Europe/Madrid') -> pd.DataFrame:
+def add_datetime_to_housing_unit_dataset(df: pd.DataFrame, tz: str = 'Europe/Madrid') -> pd.DataFrame:
     def add_hour_to_datetime(row: pd.Series):
         time_values = row[HousingUnitColumns.Time].split(':')
         hours = int(time_values[0])

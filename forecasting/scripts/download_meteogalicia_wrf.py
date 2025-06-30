@@ -14,11 +14,8 @@ from tfmmeteogalicia.thredds_wrf import (
 async def main() -> None:
     parallel_connections = 4
     data_dir = Path("../data/meteogalicia/thredds/wrf_hist")
-    dates = [
-        pd.Timestamp(year=2024, month=1, day=18, hour=0, minute=0, second=0, tzinfo=timezone.utc),
-        pd.Timestamp(year=2024, month=1, day=19, hour=0, minute=0, second=0, tzinfo=timezone.utc),
-    ]
-    latitude, longitude = 43.20342940827081, -2.0500748424398574
+    dates = pd.date_range(start="2024-05-01", end="2024-06-01", freq="D", tz=timezone.utc)
+    latitude, longitude = 41.6524241,-0.9280126
     weather_vars = [MeteoGaliciaWRFVar.TEMP]
     conn = TCPConnector(limit=parallel_connections)
     async with ClientSession(connector=conn) as session:
@@ -27,7 +24,7 @@ async def main() -> None:
                 weather_vars
             ).add_date_range(
                 start=date,
-                end=date + pd.Timedelta(days=4),
+                end=date + pd.Timedelta(days=2),
             ).add_point(
                 (latitude, longitude)
             ).accept_csv(
