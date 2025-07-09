@@ -1,141 +1,367 @@
-import os, math
+#!/usr/bin/env python3
+# eda_consumos.py
+
+import os
+import math
 from pathlib import Path
 
-import streamlit as st
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import scipy.stats as ss
 
-# ——————————— Funciones cacheadas ———————————
+from statsmodels.tsa.seasonal import seasonal_decompose, STL
+from pandas.plotting import autocorrelation_plot
 
-DATOS_CARPETA = Path("data/viviendas/consumos")
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
-@st.cache_data(show_spinner=False)
-def load_raw_consumos() -> pd.DataFrame:
-    """Carga y preprocesa todos los CSV sólo una vez."""
+# ————————————————— Ajustes globales de Matplotlib —————————————————
+mpl.rcParams['figure.figsize'] = (12, 8)
+mpl.rcParams['figure.dpi']     = 150
+mpl.rcParams['savefig.dpi']    = 150
+mpl.rcParams['font.size']      = 10
+mpl.rcParams['axes.titlesize'] = 12
+mpl.rcParams['axes.labelsize'] = 11
+mpl.rcParams['legend.fontsize']= 9
+mpl.rcParams['xtick.labelsize']= 9
+mpl.rcParams['ytick.labelsize']= 9
+mpl.rcParams['figure.constrained_layout.use'] = True
+
+# ————————————————— Input / Output —————————————————
+
+def crear_carpetas(project_root: Path):
+    out_csv   = project_root / "resultados" / "eda" / "csv"
+    out_plots = project_root / "resultados" / "eda" / "plots"
+    out_csv.mkdir(parents=True, exist_ok=True)
+    out_plots.mkdir(parents=True, exist_ok=True)
+    return out_csv, out_plots
+
+def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
+    archivos = sorted([f for f in os.listdir(carpeta) if f.endswith('.csv')])
     dfs = []
-    for fn in sorted(os.listdir(DATOS_CARPETA)):
-        if fn.endswith(".csv"):
-            df = pd.read_csv(DATOS_CARPETA/fn, sep=";")
-            df["hogar"] = fn[:-4]
-            dfs.append(df)
-    df = pd.concat(dfs, ignore_index=True)
-    df["time"] = df["time"].replace("24:00","00:00")
-    df["timestamp"] = pd.to_datetime(
-        df["date"] + " " + df["time"],
-        format="%d/%m/%Y %H:%M", errors="coerce"
+    for fn in archivos:
+        df = pd.read_csv(carpeta / fn, sep=sep)
+        df['hogar'] = fn.split('.')[0]
+        dfs.append(df)
+    return pd.concat(dfs, ignore_index=True)
+
+# ————————————————— Preprocesado —————————————————
+
+def preparar_timestamp(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df['time'] = df['time'].replace('24:00', '00:00')
+    df['timestamp'] = pd.to_datetime(
+        df['date'] + ' ' + df['time'],
+        format='%d/%m/%Y %H:%M',
+        errors='coerce'
     )
-    df["month"]     = df["timestamp"].dt.month
-    df["hour"]      = df["timestamp"].dt.hour
-    df["dayofweek"] = df["timestamp"].dt.weekday
-    df["day_type"]  = df["dayofweek"].map(lambda wd: "finde" if wd>=5 else "lab")
+    df['date_only']  = df['timestamp'].dt.date
+    df['year']       = df['timestamp'].dt.year
+    df['month']      = df['timestamp'].dt.month
+    df['dayofyear']  = df['timestamp'].dt.dayofyear
+    df['dayofweek']  = df['timestamp'].dt.weekday
+    df['hour']       = df['timestamp'].dt.hour
+    df['month_year'] = df['timestamp'].dt.to_period('M').astype(str)
+    df['season']     = df['month'].map(lambda m:
+                         'invierno' if m in (12,1,2) else
+                         'primavera' if m in (3,4,5) else
+                         'verano' if m in (6,7,8) else
+                         'otoño')
+    df['day_type']   = df['dayofweek'].map(lambda wd:
+                         'fin de semana' if wd >= 5 else 'entre semana')
     return df
 
-@st.cache_data
-def pivot_global_month_hour(df: pd.DataFrame) -> pd.DataFrame:
-    return df.pivot_table("consumptionKWh", index="month", columns="hour", aggfunc="mean").fillna(0)
+# ————————————————— Estadísticas y métricas —————————————————
 
-@st.cache_data
-def pivot_per_home_month_hour(df: pd.DataFrame, hogares: list) -> dict:
-    out = {}
-    for h in hogares:
-        d = df[df["hogar"]==h]
-        out[h] = d.pivot_table("consumptionKWh", index="month", columns="hour", aggfunc="mean").fillna(0)
+def basic_metrics(df: pd.DataFrame, group_cols: list) -> pd.DataFrame:
+    g = df.groupby(group_cols)['consumptionKWh']
+    agg = g.agg([
+        'mean','median','min','max','std',
+        lambda x: np.percentile(x,25),
+        lambda x: np.percentile(x,50),
+        lambda x: np.percentile(x,75),
+    ])
+    agg.columns = ['mean','median','min','max','std','p25','p50','p75']
+    return agg.reset_index()
+
+def estadisticas_diarias(df: pd.DataFrame) -> pd.DataFrame:
+    g = df.groupby(['hogar','date_only'])['consumptionKWh']
+    agg = g.agg(['mean','std','min','max','sum']).reset_index()
+    return agg.rename(columns={
+        'mean':'consumo_medio','std':'consumo_std',
+        'min':'consumo_min','max':'consumo_max','sum':'consumo_total'
+    })
+
+def calcular_metricas_hogar(df: pd.DataFrame) -> pd.DataFrame:
+    g = df.groupby('hogar')['consumptionKWh']
+    cv   = g.std()/g.mean()
+    skew = g.apply(lambda x: ss.skew(x, nan_policy='omit'))
+    kurt = g.apply(lambda x: ss.kurtosis(x, nan_policy='omit'))
+    return pd.DataFrame({
+        'hogar':    cv.index,
+        'cv':       cv.values,
+        'skewness': skew.values,
+        'kurtosis': kurt.values
+    })
+
+def descriptive_by_house(df: pd.DataFrame) -> pd.DataFrame:
+    g = df.groupby('hogar')['consumptionKWh']
+    dfh = pd.DataFrame({
+        'hogar':  g.mean().index,
+        'mean':   g.mean().values,
+        'median': g.median().values,
+        'min':    g.min().values,
+        'max':    g.max().values,
+        'std':    g.std().values,
+        'p25':    g.quantile(0.25).values,
+        'p50':    g.quantile(0.50).values,
+        'p75':    g.quantile(0.75).values,
+        'cv':     (g.std()/g.mean()).values,
+        'skew':   g.apply(lambda x: ss.skew(x, nan_policy='omit')).values,
+        'kurt':   g.apply(lambda x: ss.kurtosis(x, nan_policy='omit')).values,
+        'n_obs':  g.count().values
+    })
+    return dfh.reset_index(drop=True)
+
+# ————————————————— Outliers —————————————————
+
+def detect_outliers_daily(df: pd.DataFrame, out_folder: Path, threshold: float = 3.0) -> pd.DataFrame:
+    d = estadisticas_diarias(df)
+    d['z'] = d.groupby('hogar')['consumo_total'] \
+              .transform(lambda x: (x - x.mean()) / x.std())
+    out = d[d['z'].abs() > threshold]
+    out.to_csv(out_folder/"outliers_diarios.csv", index=False)
     return out
 
-# ——————————— Carga inicial + selectores ———————————
+def detect_outliers_weekly(df: pd.DataFrame, out_folder: Path, threshold: float = 3.0) -> pd.DataFrame:
+    d = df.dropna(subset=['timestamp']).copy()
+    d['week'] = d['timestamp'].dt.to_period('W').dt.to_timestamp().dt.date
+    w = d.groupby(['hogar','week'])['consumptionKWh'] \
+         .sum().reset_index(name='weekly_sum')
+    w['z'] = w.groupby('hogar')['weekly_sum'] \
+               .transform(lambda x: (x - x.mean()) / x.std())
+    out = w[w['z'].abs() > threshold]
+    out.to_csv(out_folder/"outliers_semanales.csv", index=False)
+    return out
 
-df = load_raw_consumos()
-hogares = df["hogar"].unique().tolist()
+# ————————————————— Descomposición + Autocorrelación —————————————————
 
-st.sidebar.title("⚙️ Configuración")
-hogar_sel = st.sidebar.selectbox("🏠 Hogar (individual)", hogares)
-max_homes = st.sidebar.slider("Máximo hogares small multiples", 4, len(hogares), 12)
+def decompose_and_autocorr(df: pd.DataFrame, hogar: str, out_folder: Path):
+    """
+    Crea una figura con 4 subplots:
+      1. Trend
+      2. Seasonal
+      3. Residual
+      4. Autocorrelación
+    """
+    serie = (
+        df[df['hogar'] == hogar]
+        .set_index('timestamp')['consumptionKWh']
+        .resample('D').sum()
+        .interpolate()
+    )
+    n = len(serie)
+    if n < 14:
+        return
+    if n >= 365:
+        dec = STL(serie, period=365, robust=True).fit()
+    else:
+        dec = seasonal_decompose(serie, model='additive', period=7)
 
-# Páginas
-page = st.sidebar.radio("🔎 Sección", ["Global", "Individual"])
+    fig, axs = plt.subplots(4, 1, figsize=(8, 12), constrained_layout=True)
+    dec.trend.plot(ax=axs[0], title='Trend')
+    dec.seasonal.plot(ax=axs[1], title='Seasonal')
+    dec.resid.plot(ax=axs[2], title='Residual')
+    autocorrelation_plot(serie, ax=axs[3])
+    axs[3].set_title('Autocorrelación')
+    # Etiquetas y estilo
+    axs[0].set_ylabel('kWh')
+    axs[1].set_ylabel('kWh')
+    axs[2].set_ylabel('kWh')
+    axs[3].set_xlabel('Lag')
+    axs[3].set_ylabel('Correlation')
 
-# ——————————— PÁGINA GLOBAL ———————————
+    fig.suptitle(f'{hogar} – Descomposición & Autocorrelación', y=0.95)
+    fig.savefig(out_folder/f"{hogar}_decompose_autocorr.png", dpi=300)
+    plt.close(fig)
 
-if page == "Global":
-    st.title("📊 Comparación Global")
-    sel_homes = hogares[:max_homes]
+# ————————————————— Matrices de histogramas y boxplots por hogar —————————————————
 
-    with st.spinner("📈 Generando histogramas…"):
-        fig = px.histogram(
-            df[df["hogar"].isin(sel_homes)],
-            x="consumptionKWh", nbins=40,
-            facet_col="hogar", facet_col_wrap=4,
-            title="Histograma consumos horarios"
-        )
-        st.plotly_chart(fig, use_container_width=True)
+def plot_hist_matrix_por_hogar(df: pd.DataFrame, out_folder: Path, bins=30):
+    hogares = df['hogar'].unique()
+    n = len(hogares); cols = math.ceil(math.sqrt(n)); rows = math.ceil(n/cols)
+    fig, axes = plt.subplots(rows, cols, squeeze=False)
+    for ax, hogar in zip(axes.flatten(), hogares):
+        data = df[df['hogar']==hogar]['consumptionKWh']
+        ax.hist(data, bins=bins)
+        ax.set_title(hogar, fontsize=9)
+        ax.set_xlabel('kWh', fontsize=7)
+        ax.set_ylabel('freq', fontsize=7)
+    for ax in axes.flatten()[n:]:
+        ax.set_visible(False)
+    fig.suptitle('Histogramas por hogar')
+    fig.savefig(out_folder/"histogramas_por_hogar.png", dpi=300)
+    plt.close(fig)
 
-    with st.spinner("📦 Generando boxplots…"):
-        for grp in ["dayofweek","day_type"]:
-            fig = px.box(
-                df[df["hogar"].isin(sel_homes)],
-                x=grp, y="consumptionKWh",
-                facet_col="hogar", facet_col_wrap=4,
-                title=f"Boxplot vs {grp}"
-            )
-            st.plotly_chart(fig, use_container_width=True)
+def plot_boxplot_matrix_por_hogar(df: pd.DataFrame, group_col: str, out_folder: Path):
+    df2 = df.copy()
+    if group_col == 'month_year':
+        df2['month_year'] = df2['timestamp'].dt.to_period('M').astype(str)
+    hogares = df2['hogar'].unique()
+    n = len(hogares); cols = math.ceil(math.sqrt(n)); rows = math.ceil(n/cols)
+    fig, axes = plt.subplots(rows, cols, squeeze=False)
+    for ax, hogar in zip(axes.flatten(), hogares):
+        dfh = df2[df2['hogar']==hogar]
+        dfh.boxplot(column='consumptionKWh', by=group_col, ax=ax)
+        ax.set_title(hogar, fontsize=9)
+        ax.set_xlabel(''); ax.set_ylabel('')
+    for ax in axes.flatten()[n:]:
+        ax.set_visible(False)
+    fig.suptitle(f'Boxplots por hogar vs {group_col}')
+    fig.savefig(out_folder/f"boxplots_por_hogar_{group_col}.png", dpi=300)
+    plt.close(fig)
 
-    with st.spinner("🌡️ Generando heatmap global…"):
-        pivot_all = pivot_global_month_hour(df)
-        fig = px.imshow(
-            pivot_all, aspect="auto",
-            labels={"x":"Hora","y":"Mes","color":"kWh"},
-            title="Consumo medio mes vs hora (global)"
-        )
-        st.plotly_chart(fig, use_container_width=True)
+# ————————————————— Líneas de media por grupo —————————————————
 
-    with st.spinner("🔳 Generando small multiples de heatmaps…"):
-        pivots = pivot_per_home_month_hour(df, sel_homes)
-        cols = int(math.sqrt(len(sel_homes)))
-        rows = math.ceil(len(sel_homes) / cols)
-        fig = make_subplots(rows=rows, cols=cols,
-                            subplot_titles=sel_homes,
-                            horizontal_spacing=0.02,
-                            vertical_spacing=0.05)
-        for i,h in enumerate(sel_homes):
-            r = i//cols+1; c = i%cols+1
-            hm = go.Heatmap(
-                z=pivots[h].values,
-                x=pivots[h].columns,
-                y=pivots[h].index,
-                coloraxis="coloraxis",
-                showscale=(i==0)
-            )
-            fig.add_trace(hm, row=r, col=c)
-            fig.update_xaxes(showticklabels=False, row=r, col=c)
-            fig.update_yaxes(showticklabels=False, row=r, col=c)
-        fig.update_layout(coloraxis=dict(colorbar=dict(title="kWh")),
-                          height=rows*200, width=cols*250)
-        st.plotly_chart(fig, use_container_width=True)
+def plot_matrix_line_por_hogar(df: pd.DataFrame, group_col: str, out_folder: Path):
+    hogares = df['hogar'].unique()
+    n = len(hogares); cols = math.ceil(math.sqrt(n)); rows = math.ceil(n/cols)
+    fig, axes = plt.subplots(rows, cols, squeeze=False)
+    for ax, hogar in zip(axes.flatten(), hogares):
+        d = df[df['hogar']==hogar]
+        m = d.groupby(group_col)['consumptionKWh'].mean()
+        ax.plot(m.index, m.values)
+        ax.set_title(hogar, fontsize=9)
+        ax.set_xlabel(group_col, fontsize=7)
+        ax.set_ylabel('kWh', fontsize=7)
+    for ax in axes.flatten()[n:]:
+        ax.set_visible(False)
+    fig.suptitle(f'Media consumo vs {group_col}')
+    fig.savefig(out_folder/f"matrix_line_por_{group_col}.png", dpi=300)
+    plt.close(fig)
 
-# ——————————— PÁGINA INDIVIDUAL ———————————
+# ————————————————— Consumo medio por día del año (todas viviendas) —————————————————
 
-else:
-    st.title(f"🏠 Análisis de {hogar_sel}")
-    dfh = df[df["hogar"]==hogar_sel]
+def plot_all_homes_dayofyear_per_year(df: pd.DataFrame, out_folder: Path):
+    years = sorted(df['year'].dropna().unique())
+    for y in years:
+        d = df[df['year']==y]
+        pivot = d.groupby(['dayofyear','hogar'])['consumptionKWh'].mean().unstack()
+        plt.figure()
+        for hogar in pivot.columns:
+            plt.plot(pivot.index, pivot[hogar], alpha=0.6, label=hogar)
+        plt.xlim(1,365)
+        plt.xlabel('Día del año')
+        plt.ylabel('kWh')
+        plt.title(f'Consumo medio por día del año {int(y)}')
+        plt.legend(fontsize=6, ncol=3)
+        plt.savefig(out_folder/f"all_homes_dayofyear_{int(y)}.png", dpi=300)
+        plt.close()
 
-    with st.spinner("📦 Boxplots individuales…"):
-        for grp in ["dayofweek","day_type"]:
-            fig = px.box(
-                dfh, x=grp, y="consumptionKWh",
-                title=f"{hogar_sel}: consumo vs {grp}"
-            )
-            st.plotly_chart(fig, use_container_width=True)
+# ————————————————— Heatmaps mes vs hora matriz —————————————————
 
-    with st.spinner("🌡️ Heatmap individual…"):
-        pivot = pivot_per_home_month_hour(df, [hogar_sel])[hogar_sel]
-        fig = px.imshow(
-            pivot, aspect="auto",
-            labels={"x":"Hora","y":"Mes","color":"kWh"},
-            title=f"{hogar_sel}: consumo medio mes vs hora"
-        )
-        st.plotly_chart(fig, use_container_width=True)
+def plot_heatmap_matrix_month_hour(df: pd.DataFrame, out_folder: Path, suffix: str=""):
+    hogares = df['hogar'].unique()
+    n = len(hogares); cols = math.ceil(math.sqrt(n)); rows = math.ceil(n/cols)
+    fig, axes = plt.subplots(rows, cols, squeeze=False)
+    im = None
+    for ax, hogar in zip(axes.flatten(), hogares):
+        d = df[df['hogar']==hogar]
+        pivot = d.groupby(['month','hour'])['consumptionKWh'].mean().unstack().fillna(0)
+        im = ax.imshow(pivot.values, aspect='auto', origin='lower')
+        ax.set_title(hogar, fontsize=9)
+        ax.set_xlabel('Hora', fontsize=7)
+        ax.set_ylabel('Mes', fontsize=7)
+    for ax in axes.flatten()[n:]:
+        ax.set_visible(False)
+    fig.suptitle('Heatmap mes vs hora por hogar')
+    fig.colorbar(im, ax=axes, fraction=0.02)
+    fname = f"heatmap_matrix_month_hour{('_'+suffix) if suffix else ''}.png"
+    fig.savefig(out_folder/fname, dpi=300)
+    plt.close(fig)
 
-    # …añade aquí más secciones cacheadas si lo deseas…
+# ————————————————— PCA —————————————————
 
+def aplicar_pca(df_features: pd.DataFrame, out_folder: Path, varianza_obj=0.95):
+    scaler = StandardScaler()
+    Xs = scaler.fit_transform(df_features.values)
+    pca = PCA(n_components=varianza_obj, random_state=0)
+    Xp = pca.fit_transform(Xs)
+    var_exp = pca.explained_variance_ratio_.cumsum()
+    plt.figure()
+    plt.plot(range(1,len(var_exp)+1), var_exp, marker='o')
+    plt.axhline(varianza_obj, linestyle='--')
+    plt.xlabel('Componentes'); plt.ylabel('Varianza acumulada')
+    plt.title('PCA Scree Plot')
+    plt.savefig(out_folder/"pca_varianza.png", dpi=300)
+    plt.close()
+    if Xp.shape[1] >= 2:
+        plt.figure()
+        plt.scatter(Xp[:,0], Xp[:,1], s=20, alpha=0.7)
+        plt.xlabel('PC1'); plt.ylabel('PC2')
+        plt.title('PCA PC1 vs PC2')
+        plt.savefig(out_folder/"pca_scatter.png", dpi=300)
+        plt.close()
+    pcs = pd.DataFrame(Xp, index=df_features.index,
+                       columns=[f'PC{i+1}' for i in range(Xp.shape[1])])
+    return pca, pcs
+
+# ————————————————— Main —————————————————
+
+def main():
+    root = Path.cwd()
+    data_dir = root/"data"/"viviendas"/"consumos"
+    out_csv, out_plots = crear_carpetas(root)
+
+    df = cargar_todos_consumos(data_dir)
+    df = preparar_timestamp(df)
+
+    # Guardar métricas
+    basic_metrics(df,['date_only']).to_csv(out_csv/"basic_por_dia.csv", index=False)
+    basic_metrics(df,['hour']).to_csv(out_csv/"basic_por_hora.csv", index=False)
+    basic_metrics(df,['hogar']).to_csv(out_csv/"basic_por_hogar.csv", index=False)
+    estadisticas_diarias(df).to_csv(out_csv/"estadisticas_diarias.csv", index=False)
+    calcular_metricas_hogar(df).to_csv(out_csv/"metadatos_hogar.csv", index=False)
+    descriptive_by_house(df).to_csv(out_csv/"descriptivos_por_hogar.csv", index=False)
+
+    # Histogramas y boxplots globales por hogar
+    plot_hist_matrix_por_hogar(df, out_plots, bins=40)
+    for col in ['day_type','season','month','year','month_year']:
+        plot_boxplot_matrix_por_hogar(df, col, out_plots)
+
+    # Tendencias/patrones lineales
+    for col in ['hour','dayofweek','month','year','month_year','season','day_type']:
+        plot_matrix_line_por_hogar(df, col, out_plots)
+
+    # Descomposición + Autocorrelación por hogar
+    for hogar in df['hogar'].unique():
+        decompose_and_autocorr(df, hogar, out_plots)
+
+    # Consumo medio día-año por año
+    plot_all_homes_dayofyear_per_year(df, out_plots)
+
+    # Heatmaps mes vs hora global y por año
+    plot_heatmap_matrix_month_hour(df, out_plots)
+    for y in sorted(df['year'].dropna().unique()):
+        d = df[df['year']==y]
+        plot_heatmap_matrix_month_hour(d, out_plots, suffix=str(int(y)))
+
+    # Outliers
+    detect_outliers_daily(df, out_csv)
+    detect_outliers_weekly(df, out_csv)
+
+    # PCA mensual último año
+    last_year = df['year'].max()
+    m = (df[df['year']==last_year]
+         .groupby(['hogar', df['month']])['consumptionKWh']
+         .sum().unstack().fillna(0))
+    m_norm = m.div(m.sum(axis=1), axis=0)
+    _, pcs = aplicar_pca(m_norm, out_plots)
+    pcs.to_csv(out_csv/"pca_components.csv", index=True)
+
+    print("EDA completo. CSV en resultados/eda/csv/, plots en resultados/eda/plots/")
+
+if __name__ == "__main__":
+    main()
