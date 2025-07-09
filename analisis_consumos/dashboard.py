@@ -188,45 +188,31 @@ with tab_hogar:
             aspect="auto"
         )
         st.plotly_chart(fig_hm, use_container_width=True)
+    
     st.subheader("🔬 Descomposición y Autocorrelación")
-
-    # Preparamos la serie diaria
-    serie = (
-        dfh
+    serie = (dfh
         .set_index('timestamp')['consumptionKWh']
         .resample('D').sum()
         .interpolate()
     )
     n = len(serie)
-    if n < 14:
-        st.info("No hay suficientes datos (mínimo 14 días) para descomponer.")
-    else:
-        # Elegimos método según longitud
+    if n >= 14:
         if n >= 365:
             decomposer = STL(serie, period=365, robust=True).fit()
         else:
             decomposer = seasonal_decompose(serie, model='additive', period=7)
 
-        # Dibujamos con Matplotlib y lo mostramos con st.pyplot()
-        fig, axs = plt.subplots(4, 1, figsize=(10, 8), constrained_layout=True)
-        axs[0].plot(decomposer.trend.index,    decomposer.trend,    label='Trend')
-        axs[0].set_ylabel('kWh')
-        axs[0].set_title(f'{hogar_sel} – Trend')
+        # *** Ponlo TODO dentro de un expander para que sólo cargue al abrirlo ***
+        with st.expander("Ver descomposición y autocorrelación", expanded=False):
+            fig, axs = plt.subplots(4, 1, figsize=(10, 8), constrained_layout=True)
+            axs[0].plot(decomposer.trend.index,    decomposer.trend);    axs[0].set_title("Trend")
+            axs[1].plot(decomposer.seasonal.index, decomposer.seasonal); axs[1].set_title("Seasonal")
+            axs[2].plot(decomposer.resid.index,    decomposer.resid);    axs[2].set_title("Residual")
+            autocorrelation_plot(serie, ax=axs[3]); axs[3].set_title("Autocorrelación")
 
-        axs[1].plot(decomposer.seasonal.index, decomposer.seasonal, label='Seasonal')
-        axs[1].set_ylabel('kWh')
-        axs[1].set_title(f'{hogar_sel} – Seasonal')
-
-        axs[2].plot(decomposer.resid.index,    decomposer.resid,    label='Residual')
-        axs[2].set_ylabel('kWh')
-        axs[2].set_title(f'{hogar_sel} – Residual')
-
-        autocorrelation_plot(serie, ax=axs[3])
-        axs[3].set_title(f'{hogar_sel} – Autocorrelación')
-        axs[3].set_ylabel('Correlation')
-        axs[3].set_xlabel('Lag')
-
-        st.pyplot(fig)
+            # Muestra y cierra la figura inmediatamente
+            st.pyplot(fig)
+            plt.close(fig)
 
 
 # ——————————— PESTAÑA CURVAS DE CONSUMO ———————————
