@@ -10,7 +10,9 @@ from plotly.subplots import make_subplots
 
 # ———————————— Carga y preprocesado cacheado ————————————
 
-DATOS_CARPETA = Path("data/viviendas/consumos")
+# Por esto:
+BASE = Path(__file__).parent
+DATOS_CARPETA = BASE / "analisis_consumos" / "data" / "viviendas" / "consumos"
 
 @st.cache_data(show_spinner=False)
 def load_data() -> pd.DataFrame:
