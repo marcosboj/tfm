@@ -12,7 +12,7 @@ from plotly.subplots import make_subplots
 
 # Por esto:
 BASE = Path(__file__).parent
-DATOS_CARPETA = BASE / "analisis_consumos" / "data" / "viviendas" / "consumos"
+DATOS_CARPETA = BASE / "data" / "viviendas" / "consumos"
 
 @st.cache_data(show_spinner=False)
 def load_data() -> pd.DataFrame:
