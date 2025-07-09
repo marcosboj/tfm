@@ -235,8 +235,8 @@ with tab_series:
     )
     # selector de viviendas
     viviendas_sel = st.multiselect(
-        "Viviendas", hogares,
-        default=[hogar_sel] if 'hogar_sel' in locals() else hogares[:3]
+    "Viviendas", hogares,
+    default=hogares    # marcamos todas por defecto
     )
 
     # filtrar y graficar
