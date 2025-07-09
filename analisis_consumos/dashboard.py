@@ -107,62 +107,74 @@ tab_global, tab_hogar = st.tabs(["Comparación Global", "Análisis por Hogar"])
 
 with tab_global:
     st.subheader("📚 Histograma de consumos horarios")
-    fig_hist = px.histogram(
-        df[df["hogar"].isin(sel_homes)],
-        x="consumptionKWh", nbins=40,
-        facet_col="hogar", facet_col_wrap=4,
-        title="Distribución consumos horarios (subset hogares)"
-    )
-    st.plotly_chart(fig_hist, use_container_width=True)
+
+    if st.checkbox("Mostrar histograma de consumos horarios", key="chk_hist"):
+        with st.spinner("Generando histograma…"):
+            fig_hist = px.histogram(
+                df[df["hogar"].isin(sel_homes)],
+                x="consumptionKWh", nbins=40,
+                facet_col="hogar", facet_col_wrap=4,
+                title="Distribución consumos horarios (subset hogares)"
+            )
+            st.plotly_chart(fig_hist, use_container_width=True)
 
     st.subheader("📚 Boxplots globales por agrupación")
+    # Cada boxplot en su expander
     for grp in ["dayofweek","day_type","hour","month","season","year","month_year"]:
-        fig_box = px.box(
-            df[df["hogar"].isin(sel_homes)],
-            x=grp, y="consumptionKWh",
-            facet_col="hogar", facet_col_wrap=4,
-            title=f"Consumo vs {grp}"
-        )
-        st.plotly_chart(fig_box, use_container_width=True)
+        exp = st.expander(f"Boxplot vs {grp}", expanded=False)
+        with exp:
+            with st.spinner(f"Generando boxplot vs {grp}…"):
+                fig_box = px.box(
+                    df[df["hogar"].isin(sel_homes)],
+                    x=grp, y="consumptionKWh",
+                    facet_col="hogar", facet_col_wrap=4,
+                    title=f"Consumo vs {grp}"
+                )
+                st.plotly_chart(fig_box, use_container_width=True)
 
     st.subheader("🌡️ Heatmap global mes vs hora")
-    pivot_all = pivot_global_month_hour(df)
-    fig_allhm = px.imshow(
-        pivot_all,
-        labels={"x":"Hora","y":"Mes","color":"kWh"},
-        title="Consumo medio por mes/hora (global)",
-        aspect="auto"
-    )
-    st.plotly_chart(fig_allhm, use_container_width=True)
+    if st.checkbox("Mostrar heatmap global mes vs hora", key="chk_hm_global"):
+        with st.spinner("Generando heatmap global…"):
+            pivot_all = pivot_global_month_hour(df)
+            fig_allhm = px.imshow(
+                pivot_all,
+                labels={"x":"Hora","y":"Mes","color":"kWh"},
+                title="Consumo medio por mes/hora (global)",
+                aspect="auto"
+            )
+            st.plotly_chart(fig_allhm, use_container_width=True)
 
     st.subheader("🌡️ Rejilla de heatmaps mes vs hora por hogar")
-    pivots = pivot_per_home_month_hour(df, sel_homes)
-    cols = int(math.sqrt(len(sel_homes)))
-    rows = math.ceil(len(sel_homes) / cols)
-    fig = make_subplots(
-        rows=rows, cols=cols,
-        subplot_titles=sel_homes,
-        horizontal_spacing=0.02, vertical_spacing=0.05
-    )
-    for i, h in enumerate(sel_homes):
-        r = i // cols + 1
-        c = i % cols + 1
-        hm = go.Heatmap(
-            z=pivots[h].values,
-            x=pivots[h].columns,
-            y=pivots[h].index,
-            coloraxis="coloraxis",
-            showscale=(i == 0)
-        )
-        fig.add_trace(hm, row=r, col=c)
-        fig.update_xaxes(showticklabels=False, row=r, col=c)
-        fig.update_yaxes(showticklabels=False, row=r, col=c)
-    fig.update_layout(
-        coloraxis=dict(colorbar=dict(title="kWh")),
-        height=rows * 200, width=cols * 250,
-        title_text="Small multiples: mes vs hora"
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    if st.checkbox("Mostrar small multiples de heatmaps", key="chk_hm_sm"):
+        with st.spinner("Generando small multiples…"):
+            pivots = pivot_per_home_month_hour(df, sel_homes)
+            cols = int(math.sqrt(len(sel_homes)))
+            rows = math.ceil(len(sel_homes) / cols)
+            fig = make_subplots(
+                rows=rows, cols=cols,
+                subplot_titles=sel_homes,
+                horizontal_spacing=0.02, vertical_spacing=0.05
+            )
+            for i, h in enumerate(sel_homes):
+                r = i // cols + 1
+                c = i % cols + 1
+                hm = go.Heatmap(
+                    z=pivots[h].values,
+                    x=pivots[h].columns,
+                    y=pivots[h].index,
+                    coloraxis="coloraxis",
+                    showscale=(i == 0)
+                )
+                fig.add_trace(hm, row=r, col=c)
+                fig.update_xaxes(showticklabels=False, row=r, col=c)
+                fig.update_yaxes(showticklabels=False, row=r, col=c)
+            fig.update_layout(
+                coloraxis=dict(colorbar=dict(title="kWh")),
+                height=rows * 200, width=cols * 250,
+                title_text="Small multiples: mes vs hora"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+
 
 # ———————————— PESTAÑA INDIVIDUAL ————————————
 
