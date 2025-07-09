@@ -100,8 +100,12 @@ max_homes = st.sidebar.slider(
 )
 sel_homes = hogares[:max_homes]
 
-# Pestañas
-tab_global, tab_hogar = st.tabs(["Comparación Global", "Análisis por Hogar"])
+# Pestañas: ahora tres
+tab_global, tab_hogar, tab_series = st.tabs([
+    "Comparación Global",
+    "Análisis por Hogar",
+    "Curvas de Consumo"
+])
 
 # ———————————— PESTAÑA GLOBAL ————————————
 
@@ -199,3 +203,63 @@ with tab_hogar:
         aspect="auto"
     )
     st.plotly_chart(fig_hm, use_container_width=True)
+
+    
+# ———————————— PESTAÑA SERIES DE CONSUMO ————————————
+with tab_series:
+    st.subheader("📈 Curvas de consumo por vivienda")
+
+    # 1) Rango de fechas
+    min_date = df["timestamp"].dt.date.min()
+    max_date = df["timestamp"].dt.date.max()
+    fecha_inicio, fecha_fin = st.date_input(
+        "Selecciona rango de fechas",
+        value=[min_date, max_date],
+        min_value=min_date,
+        max_value=max_date
+    )
+    # Aseguramos que sean dos fechas
+    if isinstance(fecha_inicio, tuple) or isinstance(fecha_inicio, list):
+        fecha_inicio, fecha_fin = fecha_inicio
+
+    # 2) Selección de viviendas
+    viviendas_sel = st.multiselect(
+        "Selecciona viviendas",
+        options=hogares,
+        default=[hogar_sel]  # o [] si prefieres vacío
+    )
+
+    # 3) Filtrado y gráfico
+    if len(viviendas_sel) > 0:
+        df_f = df[
+            (df["hogar"].isin(viviendas_sel)) &
+            (df["timestamp"].dt.date >= fecha_inicio) &
+            (df["timestamp"].dt.date <= fecha_fin)
+        ].copy()
+
+        if df_f.empty:
+            st.warning("No hay datos en ese rango para las viviendas seleccionadas.")
+        else:
+            # Si tus datos son horarios, puedes agrupar por día:
+            # df_plot = df_f.groupby(
+            #     ["hogar", df_f["timestamp"].dt.date]
+            # )["consumptionKWh"].sum().reset_index(name="kWh")
+            # fig = px.line(df_plot, x="timestamp", y="kWh", color="hogar",
+            #               labels={"timestamp":"Fecha", "kWh":"Consumo (kWh)"})
+
+            # O directamente la serie horaria:
+            fig = px.line(
+                df_f,
+                x="timestamp",
+                y="consumptionKWh",
+                color="hogar",
+                labels={
+                    "timestamp":"Fecha y hora",
+                    "consumptionKWh":"Consumo (kWh)",
+                    "hogar":"Vivienda"
+                },
+                title=f"Consumo horario [{fecha_inicio} → {fecha_fin}]"
+            )
+            st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("Selecciona al menos una vivienda para mostrar la curva.")
