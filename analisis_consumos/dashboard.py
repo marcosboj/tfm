@@ -209,15 +209,23 @@ with tab_hogar:
 with tab_series:
     st.subheader("📈 Curvas de consumo por vivienda")
 
+    # --- Calcular min/max de forma segura ---
+    min_ts = df["timestamp"].min()
+    max_ts = df["timestamp"].max()
+    if pd.isna(min_ts) or pd.isna(max_ts):
+        st.error("No hay datos de fecha válidos en el DataFrame.")
+        st.stop()
+    min_date = min_ts.date()
+    max_date = max_ts.date()
+
     # 1) Rango de fechas
-    min_date = df["timestamp"].dt.date.min()
-    max_date = df["timestamp"].dt.date.max()
     fecha_inicio, fecha_fin = st.date_input(
         "Selecciona rango de fechas",
         value=[min_date, max_date],
         min_value=min_date,
         max_value=max_date
     )
+
     # Aseguramos que sean dos fechas
     if isinstance(fecha_inicio, tuple) or isinstance(fecha_inicio, list):
         fecha_inicio, fecha_fin = fecha_inicio
