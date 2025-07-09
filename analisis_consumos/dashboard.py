@@ -13,6 +13,7 @@ BASE = Path(__file__).parent
 DATOS_CARPETA = BASE / "data" / "viviendas" / "consumos"
 
 @st.cache_data(show_spinner=False)
+@st.cache_data(show_spinner=False)
 def load_data() -> pd.DataFrame:
     dfs = []
     for fn in sorted(os.listdir(DATOS_CARPETA)):
@@ -21,17 +22,37 @@ def load_data() -> pd.DataFrame:
             df["hogar"] = fn[:-4]
             dfs.append(df)
     df = pd.concat(dfs, ignore_index=True)
-    # preprocesado básico
+
+    # --- Preprocesado de fechas/hora ---
     df["time"] = df["time"].replace("24:00","00:00")
     df["timestamp"] = pd.to_datetime(
         df["date"] + " " + df["time"],
-        format="%d/%m/%Y %H:%M", errors="coerce"
+        format="%d/%m/%Y %H:%M",
+        errors="coerce"
     )
-    df["month"]     = df["timestamp"].dt.month
-    df["hour"]      = df["timestamp"].dt.hour
-    df["dayofweek"] = df["timestamp"].dt.weekday
-    df["day_type"]  = df["dayofweek"].map(lambda wd:"finde" if wd>=5 else "lab")
+
+    # --- Columnas temporales necesarias para los boxplots ---
+    df["year"]       = df["timestamp"].dt.year
+    df["month"]      = df["timestamp"].dt.month
+    df["month_year"] = df["timestamp"].dt.to_period("M").astype(str)
+
+    df["dayofyear"]  = df["timestamp"].dt.dayofyear
+    df["dayofweek"]  = df["timestamp"].dt.weekday
+    df["hour"]       = df["timestamp"].dt.hour
+
+    # season y day_type
+    df["season"] = df["month"].map(
+        lambda m: "invierno"   if m in (12,1,2) else
+                  "primavera"  if m in (3,4,5) else
+                  "verano"     if m in (6,7,8) else
+                  "otoño"
+    )
+    df["day_type"] = df["dayofweek"].map(
+        lambda wd: "fin de semana" if wd >= 5 else "entre semana"
+    )
+
     return df
+
 
 @st.cache_data
 def pivot_global_month_hour(df: pd.DataFrame) -> pd.DataFrame:
