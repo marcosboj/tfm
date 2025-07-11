@@ -9,4 +9,6 @@ class HousingUnitColumns(StrEnum):
 
 class AdditionalHousingUnitFields(StrEnum):
     Datetime = "datetime"
+    Hour = "hour"
+    Weekday = "weekday"
     HousingUnit = "housing_unit"
