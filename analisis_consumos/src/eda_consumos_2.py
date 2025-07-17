@@ -45,18 +45,52 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
         df = pd.read_csv(carpeta / fn, sep=sep)
         df['hogar'] = fn.split('.')[0]
         dfs.append(df)
-    return pd.concat(dfs, ignore_index=True)
+    # 1. concatenamos todo
+    full_df = pd.concat(dfs, ignore_index=True)
+
+    # 2. corregimos '24:00' y generamos timestamp
+    full_df['time'] = full_df['time'].replace('24:00:00', '00:00')
+    full_df['timestamp'] = pd.to_datetime(
+        full_df['date'] + ' ' + full_df['time'],
+        format='%d/%m/%Y %H:%M',
+        errors='coerce'
+    )
+    # 3. eliminamos filas sin timestamp válido
+    n_nan = full_df['timestamp'].isna().sum()
+    if n_nan:
+        print(f"Atención: eliminando {n_nan} filas sin timestamp válido")
+        full_df = full_df.dropna(subset=['timestamp'])
+
+    # 4. detectamos duplicados reales (mismo hogar y timestamp)
+    mask_dup = full_df.duplicated(subset=['hogar','timestamp'], keep=False)
+    df_dups = full_df[mask_dup].sort_values(['hogar','timestamp'])
+    if not df_dups.empty:
+        # Mostrar un resumen de los duplicados antes de eliminarlos
+        print("=== Estos son los registros duplicados (se eliminará uno de cada par) ===")
+        print(df_dups[['hogar','timestamp','consumptionKWh']].head(20))
+        print(f"Total filas marcadas como duplicadas: {len(df_dups)}")
+        # Mostrar cuántos pares únicos (hogar, timestamp) hay
+        unique_pairs = df_dups[['hogar','timestamp']].drop_duplicates()
+        print(f"Total pares (hogar, timestamp) duplicados: {len(unique_pairs)}")
+
+        # Ahora sí, eliminamos duplicados dejando solo la primera ocurrencia
+        full_df = full_df.drop_duplicates(subset=['hogar','timestamp'], keep='first')
+        print(f"Tras eliminación, quedan {len(full_df)} filas en total.")
+
+    return full_df
 
 # ————————————————— Preprocesado —————————————————
 
 def preparar_timestamp(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
-    df['time'] = df['time'].replace('24:00', '00:00')
+    '''
+    df['time'] = df['time'].replace('24:00:00', '00:00')
     df['timestamp'] = pd.to_datetime(
         df['date'] + ' ' + df['time'],
         format='%d/%m/%Y %H:%M',
         errors='coerce'
     )
+    '''
     df['date_only']  = df['timestamp'].dt.date
     df['year']       = df['timestamp'].dt.year
     df['month']      = df['timestamp'].dt.month
@@ -149,13 +183,6 @@ def detect_outliers_weekly(df: pd.DataFrame, out_folder: Path, threshold: float 
 # ————————————————— Descomposición + Autocorrelación —————————————————
 
 def decompose_and_autocorr(df: pd.DataFrame, hogar: str, out_folder: Path):
-    """
-    Crea una figura con 4 subplots:
-      1. Trend
-      2. Seasonal
-      3. Residual
-      4. Autocorrelación
-    """
     serie = (
         df[df['hogar'] == hogar]
         .set_index('timestamp')['consumptionKWh']
@@ -176,13 +203,11 @@ def decompose_and_autocorr(df: pd.DataFrame, hogar: str, out_folder: Path):
     dec.resid.plot(ax=axs[2], title='Residual')
     autocorrelation_plot(serie, ax=axs[3])
     axs[3].set_title('Autocorrelación')
-    # Etiquetas y estilo
     axs[0].set_ylabel('kWh')
     axs[1].set_ylabel('kWh')
     axs[2].set_ylabel('kWh')
     axs[3].set_xlabel('Lag')
     axs[3].set_ylabel('Correlation')
-
     fig.suptitle(f'{hogar} – Descomposición & Autocorrelación', y=0.95)
     fig.savefig(out_folder/f"{hogar}_decompose_autocorr.png", dpi=300)
     plt.close(fig)
@@ -283,7 +308,7 @@ def plot_heatmap_matrix_month_hour(df: pd.DataFrame, out_folder: Path, suffix: s
     plt.close(fig)
 
 # ————————————————— PCA —————————————————
-
+'''
 def aplicar_pca(df_features: pd.DataFrame, out_folder: Path, varianza_obj=0.95):
     scaler = StandardScaler()
     Xs = scaler.fit_transform(df_features.values)
@@ -307,7 +332,7 @@ def aplicar_pca(df_features: pd.DataFrame, out_folder: Path, varianza_obj=0.95):
     pcs = pd.DataFrame(Xp, index=df_features.index,
                        columns=[f'PC{i+1}' for i in range(Xp.shape[1])])
     return pca, pcs
-
+'''
 # ————————————————— Main —————————————————
 
 def main():
@@ -351,7 +376,7 @@ def main():
     # Outliers
     detect_outliers_daily(df, out_csv)
     detect_outliers_weekly(df, out_csv)
-
+    '''
     # PCA mensual último año
     last_year = df['year'].max()
     m = (df[df['year']==last_year]
@@ -360,7 +385,7 @@ def main():
     m_norm = m.div(m.sum(axis=1), axis=0)
     _, pcs = aplicar_pca(m_norm, out_plots)
     pcs.to_csv(out_csv/"pca_components.csv", index=True)
-
+    '''
     print("EDA completo. CSV en resultados/eda/csv/, plots en resultados/eda/plots/")
 
 if __name__ == "__main__":

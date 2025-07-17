@@ -27,7 +27,7 @@ def load_data() -> pd.DataFrame:
     df = pd.concat(dfs, ignore_index=True)
 
     # --- Preprocesado de fechas/hora ---
-    df["time"] = df["time"].replace("24:00","00:00")
+    df["time"] = df["time"].replace("24:00:00","00:00")
     df["timestamp"] = pd.to_datetime(
         df["date"] + " " + df["time"],
         format="%d/%m/%Y %H:%M",

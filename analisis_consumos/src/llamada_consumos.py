@@ -49,8 +49,8 @@ for archivo in archivos:
     import caracteristicas_consumo
     
     #filtro = "fechas"
-    #filtro = "completo"
-    filtro = "mes"
+    filtro = "completo"
+    #filtro = "mes"
     #filtro = "estacion"
 
 

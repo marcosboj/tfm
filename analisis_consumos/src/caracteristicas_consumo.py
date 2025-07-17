@@ -17,6 +17,7 @@ Ejecución: python caracteristicas_consumos.py, (csv con datos de hasta dos año
 Este software se proporciona "tal cual", sin ninguna garantía expresa o implícita.
 This software is provided ""as-is,"" without any express or implied warranty.
 """
+#caracteristicas_consumo.py
 import pandas as pd
 from tfm.utils.data_frame import add_timestamp_values
 
@@ -50,8 +51,8 @@ def caracteristicas_consumo(csv, filtro="completo"):
             df_filtrado = datos_consumo.copy()
             nombre_filtro = "todo"
         case "fechas":
-            fecha_inicio = "2023-03-01"
-            fecha_fin = "2024-12-01"
+            fecha_inicio = "2023-01-01"
+            fecha_fin = "2025-06-30"
             df_filtrado = datos_consumo[
                 (datos_consumo["timestamp"] >= fecha_inicio) &
                 (datos_consumo["timestamp"] < fecha_fin)
