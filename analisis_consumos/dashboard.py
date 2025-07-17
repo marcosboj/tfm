@@ -22,7 +22,7 @@ def load_data() -> pd.DataFrame:
     for fn in sorted(os.listdir(DATOS_CARPETA)):
         if fn.endswith(".csv"):
             df = pd.read_csv(DATOS_CARPETA / fn, sep=";")
-            df["hogar"] = fn[:-4]
+            df["hogar"] = fn.split('_')[0]
             dfs.append(df)
     df = pd.concat(dfs, ignore_index=True)
 

@@ -43,7 +43,7 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
     dfs = []
     for fn in archivos:
         df = pd.read_csv(carpeta / fn, sep=sep)
-        df['hogar'] = fn.split('.')[0]
+        df['hogar'] = fn.split('_')[0]
         dfs.append(df)
     # 1. concatenamos todo
     full_df = pd.concat(dfs, ignore_index=True)
@@ -353,7 +353,7 @@ def main():
 
     # Histogramas y boxplots globales por hogar
     plot_hist_matrix_por_hogar(df, out_plots, bins=40)
-    for col in ['day_type','season','month','year','month_year']:
+    for col in ['dayofweek','day_type','season','month','year','month_year']:
         plot_boxplot_matrix_por_hogar(df, col, out_plots)
 
     # Tendencias/patrones lineales
