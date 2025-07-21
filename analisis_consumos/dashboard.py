@@ -60,7 +60,7 @@ def load_data() -> pd.DataFrame:
     )
     # ahora: festivo si está en CSV ó es sábado/domingo; en otro caso, laboral
     df['day_type'] = np.where(
-        df['date_only'].isin(festivos) | df['dayofweek'].isin([5, 6]),
+        df['timestamp'].dt.date.isin(festivos) | df['dayofweek'].isin([5, 6]),
         'festivo',
         'laborable'
     )
