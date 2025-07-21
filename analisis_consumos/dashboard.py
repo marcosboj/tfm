@@ -3,6 +3,7 @@ from pathlib import Path
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -50,8 +51,18 @@ def load_data() -> pd.DataFrame:
                   "verano"     if m in (6,7,8) else
                   "otoño"
     )
-    df["day_type"] = df["dayofweek"].map(
-        lambda wd: "fin de semana" if wd >= 5 else "entre semana"
+
+    festivos = (
+        pd.read_csv(BASE/'data'/'festivos_zgz.csv', parse_dates=['fecha'])
+          ['fecha']
+          .dt.date
+          .tolist()
+    )
+    # ahora: festivo si está en CSV ó es sábado/domingo; en otro caso, laboral
+    df['day_type'] = np.where(
+        df['date_only'].isin(festivos) | df['dayofweek'].isin([5, 6]),
+        'festivo',
+        'laborable'
     )
 
     return df

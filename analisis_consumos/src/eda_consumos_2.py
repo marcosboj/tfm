@@ -81,7 +81,7 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
 
 # ————————————————— Preprocesado —————————————————
 
-def preparar_timestamp(df: pd.DataFrame) -> pd.DataFrame:
+def preparar_timestamp(df: pd.DataFrame,project_root: Path) -> pd.DataFrame:
     df = df.copy()
     '''
     df['time'] = df['time'].replace('24:00:00', '00:00')
@@ -103,8 +103,19 @@ def preparar_timestamp(df: pd.DataFrame) -> pd.DataFrame:
                          'primavera' if m in (3,4,5) else
                          'verano' if m in (6,7,8) else
                          'otoño')
-    df['day_type']   = df['dayofweek'].map(lambda wd:
-                         'fin de semana' if wd >= 5 else 'entre semana')
+    
+    festivos = (
+        pd.read_csv(project_root/'data'/'festivos_zgz.csv', parse_dates=['fecha'])
+          ['fecha']
+          .dt.date
+          .tolist()
+    )
+    # ahora: festivo si está en CSV ó es sábado/domingo; en otro caso, laboral
+    df['day_type'] = np.where(
+        df['date_only'].isin(festivos) | df['dayofweek'].isin([5, 6]),
+        'festivo',
+        'laborable'
+    )
     return df
 
 # ————————————————— Estadísticas y métricas —————————————————
@@ -341,7 +352,7 @@ def main():
     out_csv, out_plots = crear_carpetas(root)
 
     df = cargar_todos_consumos(data_dir)
-    df = preparar_timestamp(df)
+    df = preparar_timestamp(df, root)
 
     # Guardar métricas
     basic_metrics(df,['date_only']).to_csv(out_csv/"basic_por_dia.csv", index=False)

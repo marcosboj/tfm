@@ -46,6 +46,7 @@ def preparar_timestamp(df: pd.DataFrame) -> pd.DataFrame:
         'verano' if m in (6,7,8) else 'otono')
     return df
 
+
 # ————————————————— Pivot Tables —————————————————
 
 def pivot_global(df):
@@ -62,6 +63,27 @@ def pivot_rolling(df, start, window_days=90):
     win = df[(df['timestamp']>=start)&(df['timestamp']<end)]
     return pivot_global(win)
 
+# ————————————————— Pivot Días Laborable/Festivo —————————————————
+def pivot_day_type(df, day_type):
+    return pivot_global(df[df['day_type'] == day_type])
+
+# ————————————————— Visualización de clusters —————————————————
+import matplotlib.pyplot as plt
+
+def plot_pca_scatter(Xp, labels, strategy, algo_name, out_path):
+    plt.figure(figsize=(6,5))
+    for c in np.unique(labels):
+        mask = labels == c
+        plt.scatter(Xp[mask,0], Xp[mask,1], s=30, alpha=0.7, label=f'Cluster {c}')
+    plt.xlabel('PC1')
+    plt.ylabel('PC2')
+    plt.title(f'{strategy} – {algo_name} PCA scatter')
+    plt.legend(loc='best', fontsize=8)
+    plt.tight_layout()
+    plt.savefig(out_path/strategy/f'{algo_name}_pca_scatter.png')
+    plt.close()
+
+
 # ————————————————— Clustering y Métricas —————————————————
 
 def aplicar_clustering(Y, X, algorithm, params, clustering_dir, strategy, algo_name, k=None):
@@ -76,6 +98,14 @@ def aplicar_clustering(Y, X, algorithm, params, clustering_dir, strategy, algo_n
         model = GaussianMixture(n_components=k, random_state=0)
         labels = model.fit_predict(X)
     # Guardar etiquetas
+    out_path = clustering_dir / strategy
+    out_path.mkdir(parents=True, exist_ok=True)
+    colname = f"{algo_name}_k{k}" if k else algo_name
+    pd.DataFrame({'hogar':Y.index, 'cluster':labels})\
+      .to_csv(out_path/f"{colname}.csv", index=False)
+    
+    # Visualización scatter PCA
+    plot_pca_scatter(X, labels, strategy, f"{algo_name}_k{k}" if k else algo_name, clustering_dir)
     out_path = clustering_dir / strategy
     out_path.mkdir(parents=True, exist_ok=True)
     colname = f"{algo_name}_k{k}" if k else algo_name
@@ -99,9 +129,22 @@ def main(data_dir:Path, project_root:Path):
     df = preparar_timestamp(df)
     clustering_dir, pca_dir = crear_carpetas_project(project_root)
 
+    # 1) Marcar días festivos vs laborables (festivos desde CSV + sáb/dom)
+    festivos = pd.read_csv(project_root/'data'/'festivos_zgz.csv')['fecha'].astype(str).tolist()
+    df['date_only'] = df['timestamp'].dt.strftime('%Y-%m-%d')
+    df['weekday']   = df['timestamp'].dt.weekday
+    df['day_type']  = np.where(
+        df['date_only'].isin(festivos) | df['weekday'].isin([5,6]),
+        'festivo','laborable'
+    )
+
     # Preprocesar y PCA
     strategies = []
     pivots = {'global':pivot_global(df)}
+    pivots = {'global': pivot_global(df)}
+    # 2) Añadir estrategias laborable y festivo
+    pivots['laborable'] = pivot_day_type(df, 'laborable')
+    pivots['festivo']   = pivot_day_type(df, 'festivo')
     for s in ['invierno','primavera','verano','otono']:
         pivots[f'estacion_{s}'] = pivot_estacional(df,s)
     for m in range(1,13):
@@ -129,6 +172,12 @@ def main(data_dir:Path, project_root:Path):
         Xp = pca.fit_transform(Xs)
         # Guardar PCA
         np.save(pca_dir/f"{strat}_Xp.npy",Xp)
+        loadings = pd.DataFrame(
+            pca.components_,
+            index=[f'PC{i+1}' for i in range(pca.n_components_)],
+            columns=pivot.columns
+        )
+        loadings.to_csv(pca_dir/f"{strat}_loadings.csv")
         for algo in algos:
                 for k in k_list:
                     m = aplicar_clustering(pivot,Xp,None,{},clustering_dir,strat,algo,k)
