@@ -48,13 +48,30 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
     # 1. concatenamos todo
     full_df = pd.concat(dfs, ignore_index=True)
 
-    # 2. corregimos '24:00' y generamos timestamp
-    full_df['time'] = full_df['time'].replace('24:00:00', '00:00')
-    full_df['timestamp'] = pd.to_datetime(
-        full_df['date'] + ' ' + full_df['time'],
-        format='%d/%m/%Y %H:%M',
-        errors='coerce'
+    ########################################
+    # 1) Crea la serie de fechas datetime (para el cálculo interno, NO crea columna)
+    _dates = pd.to_datetime(full_df['date'], dayfirst=True)
+
+    # 2) Sustituye “24:00:00” por “00:00” sólo para parsear
+    _times = full_df['time'].replace({'24:00:00': '00:00'})
+
+    # 3) Construye el timestamp local, sumando 1 día si time era “24:00:00”
+    _full_local = (
+        pd.to_datetime(
+            _dates.dt.strftime('%Y-%m-%d') + ' ' + _times,
+            format='%Y-%m-%d %H:%M',
+            errors='coerce'
+        )
+        + pd.to_timedelta(full_df['time'].eq('24:00:00').astype(int), unit='d')
     )
+
+    # 4) Localiza en Europe/Madrid y convierte a UTC, guardando en la misma columna
+    full_df['timestamp'] = (
+        _full_local
+        .dt.tz_localize('Europe/Madrid', ambiguous='infer')
+        .dt.tz_convert('UTC')
+    )
+    ########################################
     # 3. eliminamos filas sin timestamp válido
     n_nan = full_df['timestamp'].isna().sum()
     if n_nan:

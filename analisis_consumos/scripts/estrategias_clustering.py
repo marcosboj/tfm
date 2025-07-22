@@ -28,11 +28,31 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
         df['hogar'] = fn.split('.')[0]
         dfs.append(df)
     full_df = pd.concat(dfs, ignore_index=True)
-    full_df['time'] = full_df['time'].replace('24:00:00', '00:00')
-    full_df['timestamp'] = pd.to_datetime(
-        full_df['date'] + ' ' + full_df['time'],
-        format='%d/%m/%Y %H:%M', errors='coerce'
+    ########################################
+    # 1) Crea la serie de fechas datetime (para el cálculo interno, NO crea columna)
+    _dates = pd.to_datetime(full_df['date'], dayfirst=True)
+
+    # 2) Sustituye “24:00:00” por “00:00” sólo para parsear
+    _times = full_df['time'].replace({'24:00:00': '00:00'})
+
+    # 3) Construye el timestamp local, sumando 1 día si time era “24:00:00”
+    _full_local = (
+        pd.to_datetime(
+            _dates.dt.strftime('%Y-%m-%d') + ' ' + _times,
+            format='%Y-%m-%d %H:%M',
+            errors='coerce'
+        )
+        + pd.to_timedelta(full_df['time'].eq('24:00:00').astype(int), unit='d')
     )
+
+    # 4) Localiza en Europe/Madrid y convierte a UTC, guardando en la misma columna
+    full_df['timestamp'] = (
+        _full_local
+        .dt.tz_localize('Europe/Madrid', ambiguous='infer')
+        .dt.tz_convert('UTC')
+    )
+    ########################################
+
     return full_df.dropna(subset=['timestamp'])
 
 
@@ -57,15 +77,38 @@ def pivot_estacional(df, season):
 
 def pivot_mensual(df, month):
     return pivot_global(df[df['month']==month])
-
+'''
 def pivot_rolling(df, start, window_days=90):
     end = start + pd.Timedelta(days=window_days)
     win = df[(df['timestamp']>=start)&(df['timestamp']<end)]
     return pivot_global(win)
-
-# ————————————————— Pivot Días Laborable/Festivo —————————————————
+'''
 def pivot_day_type(df, day_type):
     return pivot_global(df[df['day_type'] == day_type])
+
+# ————————————————— Interpretación de componentes —————————————————
+
+def reorder_labels_by_mean(pivot: pd.DataFrame, labels: np.ndarray) -> np.ndarray:
+    dfp = pivot.copy()
+    dfp['cluster'] = labels
+    # total diario por hogar
+    dfp['total'] = dfp.drop('cluster', axis=1).sum(axis=1)
+    # media total por cluster
+    means = dfp.groupby('cluster')['total'].mean()
+    ordered = means.sort_values().index.tolist()
+    remap = {old: new for new, old in enumerate(ordered)}
+    return np.array([remap[l] for l in labels])
+
+
+def summary_by_cluster(pivot: pd.DataFrame, labels: np.ndarray) -> pd.DataFrame:
+    dfp = pivot.copy()
+    dfp['cluster'] = labels
+    hourly = dfp.groupby('cluster').mean().T
+    total = dfp.drop('cluster', axis=1).sum(axis=1)
+    total_means = total.groupby(dfp['cluster']).mean()
+    summary = hourly.copy()
+    summary.loc['total_mean_consumption'] = total_means
+    return summary
 
 # ————————————————— Visualización de clusters —————————————————
 import matplotlib.pyplot as plt
@@ -97,26 +140,31 @@ def aplicar_clustering(Y, X, algorithm, params, clustering_dir, strategy, algo_n
     elif algo_name=='GMM':
         model = GaussianMixture(n_components=k, random_state=0)
         labels = model.fit_predict(X)
+    # Reordenar etiquetas por consumo medio
+    labels_ord = reorder_labels_by_mean(Y, labels)
     # Guardar etiquetas
     out_path = clustering_dir / strategy
     out_path.mkdir(parents=True, exist_ok=True)
     colname = f"{algo_name}_k{k}" if k else algo_name
-    pd.DataFrame({'hogar':Y.index, 'cluster':labels})\
+    pd.DataFrame({'hogar':Y.index, 'cluster':labels_ord})\
       .to_csv(out_path/f"{colname}.csv", index=False)
     
     # Visualización scatter PCA
-    plot_pca_scatter(X, labels, strategy, f"{algo_name}_k{k}" if k else algo_name, clustering_dir)
+    plot_pca_scatter(X, labels_ord, strategy, f"{algo_name}_k{k}" if k else algo_name, clustering_dir)
     out_path = clustering_dir / strategy
     out_path.mkdir(parents=True, exist_ok=True)
     colname = f"{algo_name}_k{k}" if k else algo_name
-    pd.DataFrame({'hogar':Y.index, 'cluster':labels})\
+    pd.DataFrame({'hogar':Y.index, 'cluster':labels_ord})\
       .to_csv(out_path/f"{colname}.csv", index=False)
+    # Guardar perfil horario de clusters
+    summary = summary_by_cluster(Y, labels_ord)
+    summary.to_csv(out_path / f"{colname}_profile.csv")
     # Calcular métricas si hay más de 1 cluster
-    n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+    n_clusters = len(set(labels_ord)) - (1 if -1 in labels_ord else 0)
     if n_clusters>1:
-        sil = silhouette_score(X, labels)
-        dbi = davies_bouldin_score(X, labels)
-        chi = calinski_harabasz_score(X, labels)
+        sil = silhouette_score(X, labels_ord)
+        dbi = davies_bouldin_score(X, labels_ord)
+        chi = calinski_harabasz_score(X, labels_ord)
     else:
         sil = dbi = chi = np.nan
     return {'estrategia':strategy, 'algoritmo':algo_name, 'k':k,
@@ -152,11 +200,12 @@ def main(data_dir:Path, project_root:Path):
     df_sorted = df.sort_values('timestamp')
     cur = df_sorted['timestamp'].min()
     end = df_sorted['timestamp'].max()
+    '''
     while cur + pd.Timedelta(days=90)<=end:
         lbl= f'rolling_{cur.date()}_{(cur+pd.Timedelta(days=90)).date()}'
         pivots[lbl] = pivot_rolling(df_sorted,cur)
         cur+=pd.Timedelta(days=30)
-
+    '''
     # Algoritmos y parámetros
     algos = ['KMeans','Agglomerative','GMM']
     db_params = {'eps':0.5,'min_samples':2}

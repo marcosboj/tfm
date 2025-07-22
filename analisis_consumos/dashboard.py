@@ -34,7 +34,30 @@ def load_data() -> pd.DataFrame:
         format="%d/%m/%Y %H:%M",
         errors="coerce"
     )
+    ########################################
+    # 1) Crea la serie de fechas datetime (para el cálculo interno, NO crea columna)
+    _dates = pd.to_datetime(df['date'], dayfirst=True)
 
+    # 2) Sustituye “24:00:00” por “00:00” sólo para parsear
+    _times = df['time'].replace({'24:00:00': '00:00'})
+
+    # 3) Construye el timestamp local, sumando 1 día si time era “24:00:00”
+    _local = (
+        pd.to_datetime(
+            _dates.dt.strftime('%Y-%m-%d') + ' ' + _times,
+            format='%Y-%m-%d %H:%M',
+            errors='coerce'
+        )
+        + pd.to_timedelta(df['time'].eq('24:00:00').astype(int), unit='d')
+    )
+
+    # 4) Localiza en Europe/Madrid y convierte a UTC, guardando en la misma columna
+    df['timestamp'] = (
+        _local
+        .dt.tz_localize('Europe/Madrid', ambiguous='infer')
+        .dt.tz_convert('UTC')
+    )
+    ########################################
     # --- Columnas temporales necesarias para los boxplots ---
     df["year"]       = df["timestamp"].dt.year
     df["month"]      = df["timestamp"].dt.month
