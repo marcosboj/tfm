@@ -48,7 +48,7 @@ def load_data() -> pd.DataFrame:
         _local
         .dt.tz_localize(
             'Europe/Madrid',
-            ambiguous='infer',            # resuelve duplicados en otoño
+            ambiguous=False,            # resuelve duplicados en otoño
             nonexistent='shift_forward'   # desplaza horas inexistentes de primavera al siguiente instante válido
         )
         .dt.tz_convert('UTC')
