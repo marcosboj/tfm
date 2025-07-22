@@ -27,13 +27,6 @@ def load_data() -> pd.DataFrame:
             dfs.append(df)
     df = pd.concat(dfs, ignore_index=True)
 
-    # --- Preprocesado de fechas/hora ---
-    df["time"] = df["time"].replace("24:00:00","00:00")
-    df["timestamp"] = pd.to_datetime(
-        df["date"] + " " + df["time"],
-        format="%d/%m/%Y %H:%M",
-        errors="coerce"
-    )
     ########################################
     # 1) Crea la serie de fechas datetime (para el cálculo interno, NO crea columna)
     _dates = pd.to_datetime(df['date'], dayfirst=True)
