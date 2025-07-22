@@ -54,7 +54,11 @@ def load_data() -> pd.DataFrame:
     # 4) Localiza en Europe/Madrid y convierte a UTC, guardando en la misma columna
     df['timestamp'] = (
         _local
-        .dt.tz_localize('Europe/Madrid', ambiguous='infer', nonexistent='shift_forward')
+        .dt.tz_localize(
+            'Europe/Madrid',
+            ambiguous='infer',           # resuelve duplicados en otoño
+            nonexistent='shift_forward'  # desplaza las horas inexistentes de primavera al siguiente instante válido
+        )
         .dt.tz_convert('UTC')
     )
     ########################################
