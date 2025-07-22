@@ -48,7 +48,7 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
     # 4) Localiza en Europe/Madrid y convierte a UTC, guardando en la misma columna
     full_df['timestamp'] = (
         _full_local
-        .dt.tz_localize('Europe/Madrid', ambiguous='infer')
+        .dt.tz_localize('Europe/Madrid', ambiguous='infer', nonexistent='shift_forward')
         .dt.tz_convert('UTC')
     )
     ########################################
