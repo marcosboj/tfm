@@ -25,7 +25,7 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
     dfs = []
     for fn in archivos:
         df = pd.read_csv(carpeta / fn, sep=sep)
-        df['hogar'] = fn.split('.')[0]
+        df['hogar'] = fn.split('_')[0]
         dfs.append(df)
     full_df = pd.concat(dfs, ignore_index=True)
     ########################################
@@ -48,7 +48,7 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
     # 4) Localiza en Europe/Madrid y convierte a UTC, guardando en la misma columna
     full_df['timestamp'] = (
         _full_local
-        .dt.tz_localize('Europe/Madrid', ambiguous='infer', nonexistent='shift_forward')
+        .dt.tz_localize('Europe/Madrid', ambiguous=False, nonexistent='shift_forward')
         .dt.tz_convert('UTC')
     )
     ########################################
@@ -113,17 +113,24 @@ def summary_by_cluster(pivot: pd.DataFrame, labels: np.ndarray) -> pd.DataFrame:
 # ————————————————— Visualización de clusters —————————————————
 import matplotlib.pyplot as plt
 
-def plot_pca_scatter(Xp, labels, strategy, algo_name, out_path):
+def plot_pca_scatter(Xp, labels, names, strategy, algo_name, out_path):
     plt.figure(figsize=(6,5))
     for c in np.unique(labels):
         mask = labels == c
         plt.scatter(Xp[mask,0], Xp[mask,1], s=30, alpha=0.7, label=f'Cluster {c}')
+        # aquí añades la etiqueta de hogar
+        for x, y, name in zip(Xp[mask,0], Xp[mask,1], names[mask]):
+            plt.text(x, y, name, fontsize=5, alpha=0.8,
+                     ha='right', va='bottom')
     plt.xlabel('PC1')
     plt.ylabel('PC2')
     plt.title(f'{strategy} – {algo_name} PCA scatter')
     plt.legend(loc='best', fontsize=8)
     plt.tight_layout()
-    plt.savefig(out_path/strategy/f'{algo_name}_pca_scatter.png')
+    # guardamos
+    save_dir = out_path/strategy
+    save_dir.mkdir(parents=True, exist_ok=True)
+    plt.savefig(save_dir/f'{algo_name}_pca_scatter.png', dpi=150)
     plt.close()
 
 
@@ -150,12 +157,13 @@ def aplicar_clustering(Y, X, algorithm, params, clustering_dir, strategy, algo_n
       .to_csv(out_path/f"{colname}.csv", index=False)
     
     # Visualización scatter PCA
-    plot_pca_scatter(X, labels_ord, strategy, f"{algo_name}_k{k}" if k else algo_name, clustering_dir)
+    # Y.index son los nombres de hogar en el pivot
+    names = Y.index.to_numpy()
+    plot_pca_scatter(X, labels_ord, names, strategy, f"{algo_name}_k{k}", clustering_dir)
     out_path = clustering_dir / strategy
     out_path.mkdir(parents=True, exist_ok=True)
     colname = f"{algo_name}_k{k}" if k else algo_name
-    pd.DataFrame({'hogar':Y.index, 'cluster':labels_ord})\
-      .to_csv(out_path/f"{colname}.csv", index=False)
+
     # Guardar perfil horario de clusters
     summary = summary_by_cluster(Y, labels_ord)
     summary.to_csv(out_path / f"{colname}_profile.csv")
@@ -189,18 +197,26 @@ def main(data_dir:Path, project_root:Path):
     # Preprocesar y PCA
     strategies = []
     pivots = {'global':pivot_global(df)}
-    pivots = {'global': pivot_global(df)}
+
     # 2) Añadir estrategias laborable y festivo
     pivots['laborable'] = pivot_day_type(df, 'laborable')
     pivots['festivo']   = pivot_day_type(df, 'festivo')
+
+    # Añadir clusterización por cada día de la semana
+    nombres = ['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
+    for wd, nombre in enumerate(nombres):
+        mask = df['weekday'] == wd
+        pivots[f'dia_{nombre}'] = pivot_global(df[mask])
+
     for s in ['invierno','primavera','verano','otono']:
         pivots[f'estacion_{s}'] = pivot_estacional(df,s)
     for m in range(1,13):
         pivots[f'mes_{m:02d}'] = pivot_mensual(df,m)
-    df_sorted = df.sort_values('timestamp')
+    
+    '''
+    df_sorted = df.sort_values('timestamp')   
     cur = df_sorted['timestamp'].min()
     end = df_sorted['timestamp'].max()
-    '''
     while cur + pd.Timedelta(days=90)<=end:
         lbl= f'rolling_{cur.date()}_{(cur+pd.Timedelta(days=90)).date()}'
         pivots[lbl] = pivot_rolling(df_sorted,cur)
@@ -208,11 +224,11 @@ def main(data_dir:Path, project_root:Path):
     '''
     # Algoritmos y parámetros
     algos = ['KMeans','Agglomerative','GMM']
-    db_params = {'eps':0.5,'min_samples':2}
     k_list = [2,3,4,5]
 
     # Ejecutar clustering y recopilar métricas
     metrics = []
+    feature_imps = []
     for strat, pivot in pivots.items():
         # Escalado + PCA
         scaler = StandardScaler()
@@ -231,6 +247,39 @@ def main(data_dir:Path, project_root:Path):
                 for k in k_list:
                     m = aplicar_clustering(pivot,Xp,None,{},clustering_dir,strat,algo,k)
                     metrics.append(m)
+                    # 2. Cálculo de feature importances escaladas
+                    # 2.1. Estandarizo pivot para que cada columna tenga media 0 y varianza 1
+                    from sklearn.preprocessing import StandardScaler as _SS
+                    scaler_ft = _SS()
+                    pivot_scaled = pd.DataFrame(
+                        scaler_ft.fit_transform(pivot),
+                        columns=pivot.columns,
+                        index=pivot.index
+                    )
+
+                    # 2.2. Cargamos etiquetas
+                    df_lbl = pd.read_csv(clustering_dir/strat/f"{algo}_k{k}.csv")
+                    labels = df_lbl['cluster'].values
+
+                    # 2.3. Perfil sobre datos escalados
+                    perf_scaled = summary_by_cluster(pivot_scaled, labels)
+
+                    # 2.4. Varianza de cada feature (quitamos total_mean_consumption)
+                    var_ft = perf_scaled.drop('total_mean_consumption').var(axis=1)
+
+                    # 2.5. Importancia relativa (suma a 1)
+                    rel_imp = var_ft / var_ft.sum()
+
+                    # 2.6. Top-10 y acumulación
+                    top10 = rel_imp.sort_values(ascending=False).head(10)
+                    for feature, importance in top10.items():
+                        feature_imps.append({
+                            'estrategia': strat,
+                            'algoritmo': algo,
+                            'k': k,
+                            'feature': feature,
+                            'importance': importance
+                        })
 
         # Unificación de etiquetas
     all_labels = []
@@ -248,6 +297,10 @@ def main(data_dir:Path, project_root:Path):
     df_met = pd.DataFrame(metrics)
     df_met.to_csv(project_root/'resultados'/'cluster_metrics.csv',index=False)
     print('Cluster metrics saved to resultados/cluster_metrics.csv')
+
+    df_imp = pd.DataFrame(feature_imps)
+    df_imp.to_csv(project_root/'resultados'/'feature_importances.csv', index=False)
+    print('Feature importances guardadas en resultados/feature_importances.csv')
 
 if __name__=='__main__':
     project_root=Path.cwd()

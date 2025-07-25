@@ -1,0 +1,51 @@
+[INFO] Features utilizadas en el DataFrame: ['media_consumo', 'std_consumo', 'min_consumo', 'max_consumo', 'percentil_25_consumo', 'percentil_50_consumo', 'percentil_75_consumo', 'promedio_por_dia', 'consumo_medio_diario', 'Mañana', 'Mediodia', 'Tarde', 'Noche', 'Madrugada', 'sum_consumo', 'Miércoles', 'Entre semana', 's_Mañana', 's_Mediodia', 's_Tarde', 's_Noche', 's_Madrugada', 's_Miércoles', 's_Entre semana', 's_invierno', 's_otoño', 's_primavera', 's_verano', 'std_Mañana', 'std_Mediodia', 'std_Tarde', 'std_Noche', 'std_Madrugada', 'std_Miércoles', 'std_Entre semana', 'std_invierno', 'std_otoño', 'std_primavera', 'std_verano', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+
+🏘 Viviendas por cluster:
+Cluster 0 (7 viviendas): FJAG, JALG, JMM, MANA, MTTA, PAA, RTF
+Cluster 1 (5 viviendas): ABLD, FMB, GPC, LFZA, MBGV
+Cluster 2 (1 viviendas): AJVG
+Cluster 3 (4 viviendas): ATF, JACL, JLG, RFM
+
+Para 4 clusters, las medias por cluster son:
+         media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  percentil_75_consumo  promedio_por_dia  consumo_medio_diario    Mañana  Mediodia     Tarde     Noche  Madrugada  sum_consumo  Miércoles  Entre semana    s_Mañana  s_Mediodia     s_Tarde     s_Noche  s_Madrugada  s_Miércoles  s_Entre semana  s_invierno     s_otoño  s_primavera    s_verano  std_Mañana  std_Mediodia  std_Tarde  std_Noche  std_Madrugada  std_Miércoles  std_Entre semana  std_invierno  std_otoño  std_primavera  std_verano       Enero     Febrero       Marzo      Abril       Mayo     Junio      Julio     Agosto  Septiembre    Octubre  Noviembre   Diciembre
+cluster                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+0             0.303961     0.322886     0.041857     3.260714              0.119857              0.192929              0.367036          0.303961              7.295059  0.253935  0.381372  0.374460  0.387498   0.157209    910.77188   0.303961      0.303961  126.805103  285.421823  185.453954  195.029857   118.061143    910.77188       910.77188  243.211171  176.868223    256.48560  234.206886    0.081872      0.073818   0.055624   0.103078       0.039910       0.322886          0.322886      0.298094   0.267289       0.258286    0.405207   95.230223   81.510851   86.820714  81.250457  88.414429  78.62600  77.213977  78.366909   53.061223  59.852857  63.954143   66.470097
+1             0.189408     0.209863     0.023400     2.124600              0.071200              0.119800              0.209100          0.189408              4.545792  0.184339  0.230867  0.232969  0.223787   0.099368    579.37320   0.189408      0.189408   94.092000  175.929800  118.804600  114.315600    76.231200    579.37320       579.37320  156.287800  111.850600    183.83340  127.401400    0.050678      0.044108   0.063504   0.055957       0.032704       0.209863          0.209863      0.238294   0.181642       0.217765    0.180866   65.557200   54.539800   63.767400  55.661400  64.404600  55.79820  36.107800  35.495400   32.931200  40.313800  38.605600   36.190800
+2             0.259463     0.400482     0.005000     3.569000              0.051000              0.087000              0.246000          0.259463              6.227123  0.416473  0.191827  0.305621  0.398967   0.098653    809.52600   0.259463      0.259463  216.566000  149.625000  158.923000  207.463000    76.949000    809.52600       809.52600  356.177000  106.976000    243.39800  102.975000    0.107304      0.043865   0.102531   0.162661       0.046690       0.400482          0.400482      0.587846   0.225731       0.366873    0.156392  135.384000  117.293000  115.628000  68.070000  59.700000  45.91600  33.630000  23.429000   28.721000  32.416000  45.839000  103.500000
+3             0.140959     0.145014     0.028500     1.706500              0.072000              0.104000              0.148813          0.140959              3.383024  0.116627  0.186023  0.158094  0.163143   0.085905    381.47850   0.140959      0.140959   52.681250  123.100250   71.754000   75.454250    58.488750    381.47850       381.47850   88.881000   65.159250    104.20725  123.231000    0.030495      0.056711   0.034171   0.043911       0.018696       0.145014          0.145014      0.132882   0.084372       0.099146    0.208837   36.180500   28.490750   33.812500  33.028250  37.366500  46.38125  37.503500  39.346250   21.332500  22.771000  21.055750   24.209750
+
+🔥 Variables más importantes para el clustering (varianza entre centroides):
+sum_consumo       56298.715111
+s_Entre semana    56298.715111
+s_Miércoles       56298.715111
+s_invierno        13340.106110
+s_Mediodia         5080.336617
+s_Mañana           4849.537791
+s_primavera        4825.054462
+s_Noche            4048.387742
+s_verano           3497.434467
+s_Tarde            2457.948926
+s_otoño            2128.632765
+Enero              1796.649232
+Febrero            1443.440637
+Diciembre          1252.917016
+Marzo              1204.314975
+s_Madrugada         637.076083
+Agosto              566.044812
+Mayo                438.238219
+Julio               432.441194
+Abril               420.671886
+dtype: float64
+
+💡 Features con mayor carga en el primer componente PCA:
+s_Miércoles             0.170036
+s_Entre semana          0.170036
+sum_consumo             0.170036
+consumo_medio_diario    0.168908
+promedio_por_dia        0.168908
+Entre semana            0.168908
+Miércoles               0.168908
+media_consumo           0.168908
+Noviembre               0.163698
+percentil_75_consumo    0.162972
+dtype: float64

@@ -19,32 +19,51 @@ This software is provided ""as-is,"" without any express or implied warranty.
 """
 #caracteristicas_consumo.py
 import pandas as pd
+import numpy as np
+
 from tfm.utils.data_frame import add_timestamp_values
 
 def caracteristicas_consumo(csv, filtro="completo"):
+    # 1. Leer CSV
     datos_consumo = pd.read_csv(csv, sep=";")
     
-       
-    #print(datos_consumo.columns)
-    datos_consumo.head()
-
-    # 2. Arreglar posibles 24:00 en 'time'
-    if 'time' in datos_consumo.columns:
-        datos_consumo['time'] = datos_consumo['time'].replace('24:00', '00:00')
-
-    # 3. Crear la columna 'timestamp'
-    datos_consumo['timestamp'] = pd.to_datetime(datos_consumo['date'] + ' ' + datos_consumo['time'], 
-                                                format='%d/%m/%Y %H:%M', errors='coerce')
+    # —————————————— Creación avanzada de timestamp ——————————————
+    # 1) Series de fechas datetime (para el cálculo interno, NO creamos columna aún)
+    _dates = pd.to_datetime(datos_consumo['date'], dayfirst=True)
     
-    # 4. Añadir columnas de hora, día de la semana, mes
+    # 2) Sustituimos “24:00” o “24:00:00” por “00:00” solo para parsear
+    _times = datos_consumo['time'].replace({'24:00:00': '00:00', '24:00': '00:00'})
+    
+    # 3) Construimos el timestamp local, sumando 1 día si time era “24:00”
+    _full_local = (
+        pd.to_datetime(
+            _dates.dt.strftime('%Y-%m-%d') + ' ' + _times,
+            format='%Y-%m-%d %H:%M',
+            errors='coerce'
+        )
+        + pd.to_timedelta(datos_consumo['time'].isin(['24:00','24:00:00']).astype(int), unit='d')
+    )
+    
+    # 4) Localizamos en Europe/Madrid y convertimos a UTC, guardando en la misma columna
+    datos_consumo['timestamp'] = (
+        _full_local
+        .dt.tz_localize('Europe/Madrid', ambiguous=False, nonexistent='shift_forward')
+        .dt.tz_convert('UTC')
+    )
+    # ————————————————————————————————————————————————————————————————
+    # justo después de tener datos_consumo['timestamp']  
+    festivos = pd.read_csv('data/festivos_zgz.csv')['fecha'].astype(str).tolist()
+    datos_consumo['date_only'] = datos_consumo['timestamp'].dt.strftime('%Y-%m-%d')
+    datos_consumo['weekday']   = datos_consumo['timestamp'].dt.weekday
+    datos_consumo['day_type']  = np.where(
+        datos_consumo['date_only'].isin(festivos) | datos_consumo['weekday'].isin([5,6]),
+        'festivo','laborable'
+    )
+
+    # 5. Añadir columnas de hora, día de la semana, mes, etc.
     datos_consumo = add_timestamp_values(datos_consumo, 'timestamp')
 
-    # 5. Mostrar para comprobar
-    #print(datos_consumo.head())
-    ####FILTRO TIEMPO
-    # Elegir tipo de filtro
-    # Parámetros
-    
+
     # Aplicar filtro según tipo
     match filtro:
         case "completo":
@@ -59,12 +78,19 @@ def caracteristicas_consumo(csv, filtro="completo"):
             ]
             nombre_filtro = f"{fecha_inicio}_a_{fecha_fin}"
         case "mes":
-            mes, año = 12, 2024
+            mes, año = 6, 2025
             df_filtrado = datos_consumo[
                 (datos_consumo["timestamp"].dt.month == mes) &
                 (datos_consumo["timestamp"].dt.year == año)
             ]
             nombre_filtro = f"mes_{mes:02d}_{año}"
+        case "meses":
+            mes = 12  # por ejemplo junio; podrías recibirlo como parámetro
+            # filtramos **solo** por mes, sin year
+            df_filtrado = datos_consumo[
+                datos_consumo["timestamp"].dt.month == mes
+            ]
+            nombre_filtro = f"meses_{mes:02d}"           
         case "estacion":
             estacion = "verano"
             datos_consumo["estacion"] = datos_consumo["timestamp"].dt.month.map(
@@ -77,6 +103,21 @@ def caracteristicas_consumo(csv, filtro="completo"):
                 datos_consumo["estacion"] == estacion
             ]
             nombre_filtro = f"estacion_{estacion}"
+        case "dia_semana":
+            # 0=lunes, 1=martes, …, 6=domingo
+            dia = 6  # cámbialo por el número de día que quieras
+            nombres = ['lunes','martes','miercoles','jueves','viernes','sabado','domingo']
+            df_filtrado = datos_consumo[
+                datos_consumo["timestamp"].dt.weekday == dia
+            ]
+            nombre_filtro = f"dia_{nombres[dia]}"
+        case "tipo_dia":
+            tipo = "festivo"
+            # filtra por day_type, usando la columna que ya creaste
+            df_filtrado   = datos_consumo[
+                datos_consumo["day_type"] == tipo
+            ]
+            nombre_filtro = f"tipo_dia_{tipo}"
         case _:
             print("Filtro no reconocido")
             df_filtrado = datos_consumo.copy()

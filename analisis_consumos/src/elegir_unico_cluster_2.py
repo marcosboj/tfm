@@ -2,9 +2,9 @@ import pandas as pd
 import os
 
 # Rutas a adaptar según tu proyecto
-WEIGHTED_CSV = "resultados/recomendaciones_algoritmos.csv"
-LEX_CSV      = "resultados/recomendaciones_lex.csv"
-FINAL_CSV    = "resultados/recomendacion_final.csv"
+WEIGHTED_CSV = "resultados/recomendaciones_algoritmos_resumen.csv"
+LEX_CSV      = "resultados/recomendaciones_lex_resumen.csv"
+FINAL_CSV    = "resultados/recomendacion_final_resumen.csv"
 
 # 1) Cargamos ambas recomendaciones
 df_w = pd.read_csv(WEIGHTED_CSV)
@@ -17,7 +17,7 @@ combined = pd.concat([
 ], ignore_index=True)
 
 # --- FILTRO: solo k > 2 (mínimo 3 clusters) ---
-combined = combined[combined['k'] > 4]
+combined = combined[combined['k'] > 1]
 
 # 3) Contamos cuántas veces aparece cada (algoritmo, k)
 votes = (

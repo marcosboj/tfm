@@ -1,0 +1,49 @@
+[INFO] Features utilizadas en el DataFrame: ['media_consumo', 'std_consumo', 'min_consumo', 'max_consumo', 'percentil_25_consumo', 'percentil_50_consumo', 'percentil_75_consumo', 'promedio_por_dia', 'consumo_medio_diario', 'Mañana', 'Mediodia', 'Tarde', 'Noche', 'Madrugada', 'sum_consumo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo', 'Entre semana', 'Fin de semana', 's_Mañana', 's_Mediodia', 's_Tarde', 's_Noche', 's_Madrugada', 's_Lunes', 's_Martes', 's_Miércoles', 's_Jueves', 's_Viernes', 's_Sábado', 's_Domingo', 's_Entre semana', 's_Fin de semana', 's_invierno', 'std_Mañana', 'std_Mediodia', 'std_Tarde', 'std_Noche', 'std_Madrugada', 'std_Lunes', 'std_Martes', 'std_Miércoles', 'std_Jueves', 'std_Viernes', 'std_Sábado', 'std_Domingo', 'std_Entre semana', 'std_Fin de semana', 'std_invierno', 'Enero']
+
+🏘 Viviendas por cluster:
+Cluster 0 (4 viviendas): ATF, JACL, JLG, RFM
+Cluster 1 (8 viviendas): AJVG, FJAG, JALG, JMM, MANA, MTTA, PAA, RTF
+Cluster 2 (5 viviendas): ABLD, FMB, GPC, LFZA, MBGV
+
+Para 3 clusters, las medias por cluster son:
+         media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  percentil_75_consumo  promedio_por_dia  consumo_medio_diario    Mañana  Mediodia     Tarde     Noche  Madrugada  sum_consumo     Lunes    Martes  Miércoles    Jueves   Viernes    Sábado   Domingo  Entre semana  Fin de semana    s_Mañana  s_Mediodia     s_Tarde     s_Noche  s_Madrugada     s_Lunes   s_Martes  s_Miércoles   s_Jueves  s_Viernes  s_Sábado  s_Domingo  s_Entre semana  s_Fin de semana  s_invierno  std_Mañana  std_Mediodia  std_Tarde  std_Noche  std_Madrugada  std_Lunes  std_Martes  std_Miércoles  std_Jueves  std_Viernes  std_Sábado  std_Domingo  std_Entre semana  std_Fin de semana  std_invierno      Enero
+cluster                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+0             0.129368     0.119145      0.04375     1.225250              0.066000              0.096625              0.145312          0.129368              3.104836  0.112569  0.170527  0.127314  0.155446   0.083393    242.44725  0.131314  0.122835   0.129204  0.134887  0.130367  0.129171  0.125331      0.129978       0.127215   33.837750   81.544500   39.810750   49.068750     38.18550   36.434500   33.99250    36.180500  34.318750  34.152500  32.78675   34.58175       175.07875          67.3685   242.44725    0.055129      0.058053   0.017887   0.039153       0.017475   0.119921    0.098008       0.102462    0.122358     0.117153    0.127603     0.115528          0.114526           0.122544      0.119145  242.44725
+1             0.325874     0.338636      0.04125     2.800125              0.108562              0.193875              0.414750          0.325874              7.820972  0.288932  0.407452  0.369117  0.449621   0.157597    667.27040  0.336995  0.322942   0.323017  0.320293  0.317334  0.319491  0.341789      0.324008       0.331237  100.376405  208.279015  125.404105  156.161125     77.04975  103.986685  100.79625   100.249445  91.489155  89.830465  83.96725   96.95115       486.35200         180.9184   667.27040    0.111236      0.100021   0.072572   0.106606       0.051765   0.338740    0.317322       0.318238    0.325754     0.331730    0.344359     0.365386          0.328889           0.356970      0.338636  667.27040
+2             0.213580     0.261980      0.02240     2.238000              0.064400              0.121700              0.234850          0.213580              5.125911  0.176378  0.268977  0.283492  0.264801   0.102228    407.35960  0.215659  0.213549   0.224685  0.202304  0.201803  0.205789  0.229711      0.211789       0.218117   56.505000  126.186600   89.884000   84.183800     50.60020   59.999000   60.15060    65.557200  54.939400  54.648600  51.17720   60.88760       295.29480         112.0648   407.35960    0.107715      0.078452   0.047019   0.070355       0.045518   0.255210    0.254206       0.263995    0.245003     0.249768    0.251610     0.284554          0.255663           0.270445      0.261980  407.35960
+
+🔥 Variables más importantes para el clustering (varianza entre centroides):
+promedio_por_dia        1.312636
+consumo_medio_diario    1.312636
+media_consumo           1.312636
+Fin de semana           1.279703
+Sábado                  1.270830
+Tarde                   1.233898
+Domingo                 1.229811
+Entre semana            1.217765
+Martes                  1.193391
+Mediodia                1.191734
+Viernes                 1.187788
+Jueves                  1.177784
+Miércoles               1.160232
+s_Tarde                 1.136193
+percentil_75_consumo    1.132246
+Lunes                   1.078849
+s_invierno              1.066005
+Enero                   1.066005
+sum_consumo             1.066005
+s_Viernes               1.038704
+dtype: float64
+
+💡 Features con mayor carga en el primer componente PCA:
+consumo_medio_diario    0.153686
+promedio_por_dia        0.153686
+media_consumo           0.153686
+percentil_75_consumo    0.152244
+Martes                  0.151826
+Miércoles               0.151639
+Entre semana            0.151335
+s_Lunes                 0.150817
+sum_consumo             0.150353
+s_invierno              0.150353
+dtype: float64

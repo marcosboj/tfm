@@ -1,0 +1,51 @@
+[INFO] Features utilizadas en el DataFrame: ['media_consumo', 'std_consumo', 'min_consumo', 'max_consumo', 'percentil_25_consumo', 'percentil_50_consumo', 'percentil_75_consumo', 'promedio_por_dia', 'consumo_medio_diario', 'Mañana', 'Mediodia', 'Tarde', 'Noche', 'Madrugada', 'sum_consumo', 'Sábado', 'Fin de semana', 's_Mañana', 's_Mediodia', 's_Tarde', 's_Noche', 's_Madrugada', 's_Sábado', 's_Fin de semana', 's_invierno', 's_otoño', 's_primavera', 's_verano', 'std_Mañana', 'std_Mediodia', 'std_Tarde', 'std_Noche', 'std_Madrugada', 'std_Sábado', 'std_Fin de semana', 'std_invierno', 'std_otoño', 'std_primavera', 'std_verano', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+
+🏘 Viviendas por cluster:
+Cluster 0 (5 viviendas): AJVG, JALG, MANA, PAA, RTF
+Cluster 1 (5 viviendas): ABLD, FMB, GPC, LFZA, MBGV
+Cluster 2 (3 viviendas): FJAG, JMM, MTTA
+Cluster 3 (4 viviendas): ATF, JACL, JLG, RFM
+
+Para 4 clusters, las medias por cluster son:
+         media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  percentil_75_consumo  promedio_por_dia  consumo_medio_diario    Mañana  Mediodia     Tarde     Noche  Madrugada  sum_consumo    Sábado  Fin de semana    s_Mañana  s_Mediodia    s_Tarde     s_Noche  s_Madrugada    s_Sábado  s_Fin de semana  s_invierno     s_otoño  s_primavera   s_verano  std_Mañana  std_Mediodia  std_Tarde  std_Noche  std_Madrugada  std_Sábado  std_Fin de semana  std_invierno  std_otoño  std_primavera  std_verano     Enero   Febrero      Marzo      Abril       Mayo       Junio       Julio    Agosto  Septiembre    Octubre  Noviembre  Diciembre
+cluster                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+0             0.262599     0.317018     0.033800     2.932600              0.084800              0.139800              0.300700          0.262599              6.302386  0.204857  0.406185  0.294166  0.285274   0.121348   819.310200  0.262599       0.262599  106.525400   316.82440  152.96620  148.342400    94.651800  819.310200       819.310200    261.3082  164.074000   228.497400  165.43060    0.106478      0.087647   0.049364   0.055750       0.045409    0.317018           0.317018      0.371729   0.285647       0.272800    0.279065  91.76080  102.7934  90.255600  73.449200  64.792600   70.731800   48.486600  46.21220   49.067600  48.200000  66.806400   66.75400
+1             0.182760     0.221925     0.022400     2.118800              0.067200              0.101200              0.192850          0.182760              4.386236  0.181194  0.239048  0.212201  0.194485   0.100071   559.435400  0.182760       0.182760   92.791000   182.53620  108.13500   99.287200    76.686000  559.435400       559.435400    156.2296  110.574800   174.793000  117.83800    0.064763      0.057276   0.038691   0.044074       0.030251    0.221925           0.221925      0.271603   0.203765       0.218350    0.170961  51.17720   60.0966  66.258200  51.508200  57.026600   54.325200   31.684600  31.82820   36.014200  34.093600  40.467000   44.95580
+2             0.334142     0.387133     0.058333     4.121333              0.137333              0.210333              0.358333          0.334142              8.019419  0.235868  0.490351  0.414499  0.331474   0.191658   951.333187  0.334142       0.334142  111.724667   349.04836  193.68416  158.300667   138.575333  951.333187       951.333187    207.9090  182.463333   244.602333  316.35852    0.082981      0.103537   0.071958   0.082479       0.044449    0.387133           0.387133      0.285648   0.274910       0.268615    0.593958  70.97800   75.3100  92.708667  77.695333  74.198333  106.206333  110.602667  99.54952   67.163333  55.696333  59.603667   61.62100
+3             0.140233     0.151579     0.026000     1.670000              0.069000              0.099000              0.142250          0.140233              3.365595  0.117269  0.192239  0.151409  0.153165   0.087464   385.791000  0.140233       0.140233   53.085500   131.42425   69.59100   72.053250    59.637000  385.791000       385.791000     90.3785   68.997000   110.490750  115.92475    0.046023      0.060123   0.038709   0.045716       0.013316    0.151579           0.151579      0.140455   0.125129       0.125671    0.181282  32.78675   32.7565  42.634000  32.098750  35.758000   50.359500   31.196500  34.36875   24.733250  20.987250  23.276500   24.83525
+
+🔥 Variables más importantes para el clustering (varianza entre centroides):
+sum_consumo        64706.507933
+s_Fin de semana    64706.507933
+s_Sábado           64706.507933
+s_Mediodia         10928.658666
+s_verano            8923.572945
+s_invierno          5327.541272
+s_primavera         3671.928338
+s_Tarde             2901.885317
+s_otoño             2667.604282
+s_Noche             1665.709024
+Julio               1414.441608
+s_Madrugada         1152.525118
+Agosto              1002.766735
+Febrero              856.104195
+s_Mañana             703.754280
+Junio                647.408101
+Enero                645.478654
+Marzo                551.242649
+Abril                445.903163
+Noviembre            385.156991
+dtype: float64
+
+💡 Features con mayor carga en el primer componente PCA:
+sum_consumo             0.167005
+s_Fin de semana         0.167005
+s_Sábado                0.167005
+Fin de semana           0.165074
+Sábado                  0.165074
+consumo_medio_diario    0.165074
+promedio_por_dia        0.165074
+media_consumo           0.165074
+s_Mediodia              0.161211
+s_otoño                 0.160816
+dtype: float64

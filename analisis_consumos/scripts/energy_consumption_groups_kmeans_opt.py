@@ -70,8 +70,8 @@ def main(
     csv_file: Path,
     datetime_column: str = "datetime",
     modo_manual: bool = True,
-    n_clusters_analisis: Optional[int] = None,
-):
+    n_clusters_analisis: Optional[int] = None,  
+    ):
     df = pd.read_csv(csv_file, dtype={"archivo": str})
     if datetime_column in df.columns:
         df = process_timestamp(df, datetime_column, TIME_ZONE)
@@ -138,7 +138,7 @@ def main(
     nombre_filtro = csv_file.stem.replace("resumen_consumos_", "")
     n_casos = len(df)
     nombre_log = f"{nombre_filtro}_k{n_clusters_analisis}_c{n_casos}.txt"
-    ruta_log = Path("logs") / nombre_log
+    ruta_log = Path("logs/kmeans") / nombre_log
     ruta_log.parent.mkdir(exist_ok=True)
 
     with open(ruta_log, 'w', encoding='utf-8') as f:
@@ -180,9 +180,13 @@ def main(
 
 
 if __name__ == "__main__":
-    for file in DATA_DIR.glob("resumen_consumos_mes_*.csv"):
+    #for file in DATA_DIR.glob("resumenes/resumen_consumos_meses_*.csv"):
+    #for file in DATA_DIR.glob("resumenes/resumen_consumos_todo*.csv"):
+    #for file in DATA_DIR.glob("resumenes/resumen_consumos_estacion*.csv"):
+    #for file in DATA_DIR.glob("resumenes/resumen_consumos_dia*.csv"):
+    for file in DATA_DIR.glob("resumenes/resumen_consumos_tipo*.csv"):
         print(f"\n📂 Procesando archivo: {file.name}")
-        for k in [2, 3, 4]:
+        for k in [2, 3, 4, 5]:
             print(f"\n🔢 Ejecutando clustering con k={k} clusters")
             main(
                 csv_file=file,

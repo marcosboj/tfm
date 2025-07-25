@@ -1,0 +1,47 @@
+[INFO] Features utilizadas en el DataFrame: ['media_consumo', 'std_consumo', 'min_consumo', 'max_consumo', 'percentil_25_consumo', 'percentil_50_consumo', 'percentil_75_consumo', 'promedio_por_dia', 'consumo_medio_diario', 'Mañana', 'Mediodia', 'Tarde', 'Noche', 'Madrugada', 'sum_consumo', 'Lunes', 'Entre semana', 's_Mañana', 's_Mediodia', 's_Tarde', 's_Noche', 's_Madrugada', 's_Lunes', 's_Entre semana', 's_invierno', 's_otoño', 's_primavera', 's_verano', 'std_Mañana', 'std_Mediodia', 'std_Tarde', 'std_Noche', 'std_Madrugada', 'std_Lunes', 'std_Entre semana', 'std_invierno', 'std_otoño', 'std_primavera', 'std_verano', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+
+🏘 Viviendas por cluster:
+Cluster 0 (8 viviendas): AJVG, FJAG, JALG, JMM, MANA, MTTA, PAA, RTF
+Cluster 1 (9 viviendas): ABLD, ATF, FMB, GPC, JACL, JLG, LFZA, MBGV, RFM
+
+Para 2 clusters, las medias por cluster son:
+         media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  percentil_75_consumo  promedio_por_dia  consumo_medio_diario    Mañana  Mediodia     Tarde     Noche  Madrugada  sum_consumo     Lunes  Entre semana    s_Mañana  s_Mediodia     s_Tarde     s_Noche  s_Madrugada     s_Lunes  s_Entre semana  s_invierno     s_otoño  s_primavera    s_verano  std_Mañana  std_Mediodia  std_Tarde  std_Noche  std_Madrugada  std_Lunes  std_Entre semana  std_invierno  std_otoño  std_primavera  std_verano       Enero    Febrero      Marzo      Abril       Mayo      Junio      Julio     Agosto  Septiembre    Octubre  Noviembre  Diciembre
+cluster                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+0             0.293857     0.321941        0.006     3.111875              0.113375              0.180250              0.340031          0.293912              7.050639  0.277059  0.356842  0.344902  0.389951   0.143945   891.216220  0.293857      0.293857  141.079200   270.18871  172.859310  198.300000   108.789000  891.216220      891.216220    263.7574  160.027155   246.312875  221.118790     0.07173      0.094307   0.065901   0.103654       0.037248   0.321941          0.321941      0.336065   0.224229       0.258250    0.373407  103.986685  86.722750  90.654000  79.451625  76.207250  82.416415  70.832250  67.870125   53.331030  54.011750  52.684375  73.047965
+1             0.167263     0.182544        0.000     1.863444              0.070111              0.111444              0.181889          0.167340              4.012891  0.149867  0.212082  0.202446  0.197243   0.090566   492.763222  0.167263      0.167263   73.682667   153.85700  100.500222   97.886778    66.836556  492.763222      492.763222    129.0940   93.168000   142.515556  127.985667     0.04648      0.050808   0.030827   0.052561       0.020285   0.182544          0.182544      0.190481   0.163221       0.158866    0.189433   49.525889  42.630556  50.176667  46.130333  46.208556  55.124000  39.879889  32.981778   30.763778  32.104111  30.300111  36.937556
+
+🔥 Variables más importantes para el clustering (varianza entre centroides):
+sum_consumo       79382.395719
+s_Entre semana    79382.395719
+s_Lunes           79382.395719
+s_invierno         9067.115650
+s_Mediodia         6766.533376
+s_primavera        5386.941762
+s_Noche            5041.407599
+s_verano           4336.889331
+s_Tarde            2617.918792
+s_Mañana           2271.146353
+s_otoño            2235.073304
+Enero              1482.989157
+Febrero             972.060805
+s_Madrugada         880.003797
+Marzo               819.207257
+Diciembre           651.980835
+Agosto              608.598386
+Abril               555.154239
+Julio               479.024329
+Mayo                449.960834
+dtype: float64
+
+💡 Features con mayor carga en el primer componente PCA:
+sum_consumo             0.168557
+s_Entre semana          0.168557
+s_Lunes                 0.168557
+media_consumo           0.167295
+Lunes                   0.167295
+Entre semana            0.167295
+promedio_por_dia        0.167292
+consumo_medio_diario    0.167291
+Noviembre               0.160722
+percentil_75_consumo    0.160415
+dtype: float64

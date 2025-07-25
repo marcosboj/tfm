@@ -67,8 +67,12 @@ def meta_clustering(cooc: pd.DataFrame, n_clusters: int) -> pd.Series:
 
 if __name__ == '__main__':
     project_root = Path.cwd()
+    all_labels_path = project_root / 'resultados' / 'all_labels_unified_resumen.csv'
+    out_dir = project_root / 'resultados' / 'meta_clustering_resumen'
+    '''
     all_labels_path = project_root / 'resultados' / 'all_labels_unified.csv'
     out_dir = project_root / 'resultados' / 'meta_clustering'
+    '''
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # 1) Carga y filtrado de etiquetas

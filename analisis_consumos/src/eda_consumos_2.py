@@ -68,7 +68,7 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
     # 4) Localiza en Europe/Madrid y convierte a UTC, guardando en la misma columna
     full_df['timestamp'] = (
         _full_local
-        .dt.tz_localize('Europe/Madrid', ambiguous='infer', nonexistent='shift_forward')
+        .dt.tz_localize('Europe/Madrid', ambiguous=False, nonexistent='shift_forward')
         .dt.tz_convert('UTC')
     )
     ########################################
@@ -114,7 +114,7 @@ def preparar_timestamp(df: pd.DataFrame,project_root: Path) -> pd.DataFrame:
     df['dayofyear']  = df['timestamp'].dt.dayofyear
     df['dayofweek']  = df['timestamp'].dt.weekday
     df['hour']       = df['timestamp'].dt.hour
-    df['month_year'] = df['timestamp'].dt.to_period('M').astype(str)
+    df['month_year'] = df['timestamp'].dt.strftime('%Y-%m')
     df['season']     = df['month'].map(lambda m:
                          'invierno' if m in (12,1,2) else
                          'primavera' if m in (3,4,5) else
@@ -199,7 +199,13 @@ def detect_outliers_daily(df: pd.DataFrame, out_folder: Path, threshold: float =
 
 def detect_outliers_weekly(df: pd.DataFrame, out_folder: Path, threshold: float = 3.0) -> pd.DataFrame:
     d = df.dropna(subset=['timestamp']).copy()
-    d['week'] = d['timestamp'].dt.to_period('W').dt.to_timestamp().dt.date
+    d['week'] = (
+        d['timestamp']
+        .dt.tz_convert(None)           # dejamos el datetime naive
+        .dt.to_period('W')             # creamos PeriodArray semanal
+        .dt.to_timestamp()            # volvemos a Timestamp (naive)
+        .dt.date                       # sólo la fecha
+    )
     w = d.groupby(['hogar','week'])['consumptionKWh'] \
          .sum().reset_index(name='weekly_sum')
     w['z'] = w.groupby('hogar')['weekly_sum'] \
@@ -261,7 +267,7 @@ def plot_hist_matrix_por_hogar(df: pd.DataFrame, out_folder: Path, bins=30):
 def plot_boxplot_matrix_por_hogar(df: pd.DataFrame, group_col: str, out_folder: Path):
     df2 = df.copy()
     if group_col == 'month_year':
-        df2['month_year'] = df2['timestamp'].dt.to_period('M').astype(str)
+        df2['month_year'] = df2['timestamp'].dt.strftime('%Y-%m')
     hogares = df2['hogar'].unique()
     n = len(hogares); cols = math.ceil(math.sqrt(n)); rows = math.ceil(n/cols)
     fig, axes = plt.subplots(rows, cols, squeeze=False)

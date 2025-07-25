@@ -1,0 +1,53 @@
+[INFO] Features utilizadas en el DataFrame: ['media_consumo', 'std_consumo', 'min_consumo', 'max_consumo', 'percentil_25_consumo', 'percentil_50_consumo', 'percentil_75_consumo', 'promedio_por_dia', 'consumo_medio_diario', 'Mañana', 'Mediodia', 'Tarde', 'Noche', 'Madrugada', 'sum_consumo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo', 'Entre semana', 'Fin de semana', 's_Mañana', 's_Mediodia', 's_Tarde', 's_Noche', 's_Madrugada', 's_Lunes', 's_Martes', 's_Miércoles', 's_Jueves', 's_Viernes', 's_Sábado', 's_Domingo', 's_Entre semana', 's_Fin de semana', 's_invierno', 's_otoño', 's_primavera', 's_verano', 'std_Mañana', 'std_Mediodia', 'std_Tarde', 'std_Noche', 'std_Madrugada', 'std_Lunes', 'std_Martes', 'std_Miércoles', 'std_Jueves', 'std_Viernes', 'std_Sábado', 'std_Domingo', 'std_Entre semana', 'std_Fin de semana', 'std_invierno', 'std_otoño', 'std_primavera', 'std_verano', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+
+🏘 Viviendas por cluster:
+Cluster 0 (4 viviendas): ATF, JACL, JLG, RFM
+Cluster 1 (5 viviendas): JALG, JMM, MANA, MTTA, RTF
+Cluster 2 (5 viviendas): ABLD, FMB, GPC, LFZA, MBGV
+Cluster 3 (2 viviendas): FJAG, PAA
+Cluster 4 (1 viviendas): AJVG
+
+Para 5 clusters, las medias por cluster son:
+         media_consumo  std_consumo  min_consumo  max_consumo  percentil_25_consumo  percentil_50_consumo  percentil_75_consumo  promedio_por_dia  consumo_medio_diario    Mañana  Mediodia     Tarde     Noche  Madrugada  sum_consumo     Lunes    Martes  Miércoles    Jueves   Viernes    Sábado   Domingo  Entre semana  Fin de semana   s_Mañana  s_Mediodia    s_Tarde    s_Noche  s_Madrugada   s_Lunes  s_Martes  s_Miércoles  s_Jueves  s_Viernes   s_Sábado   s_Domingo  s_Entre semana  s_Fin de semana  s_invierno    s_otoño  s_primavera   s_verano  std_Mañana  std_Mediodia  std_Tarde  std_Noche  std_Madrugada  std_Lunes  std_Martes  std_Miércoles  std_Jueves  std_Viernes  std_Sábado  std_Domingo  std_Entre semana  std_Fin de semana  std_invierno  std_otoño  std_primavera  std_verano      Enero    Febrero      Marzo     Abril       Mayo      Junio      Julio     Agosto  Septiembre    Octubre  Noviembre  Diciembre
+cluster                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+0             0.136193     0.149370      0.02125       1.9035               0.06825               0.09675              0.138500          0.136193              3.268622  0.112166  0.181672  0.147663  0.154940   0.086615     852.7190  0.118032  0.156771   0.148828  0.111176  0.116001  0.140233  0.133798      0.129925       0.137012  115.94175   283.91375  154.81450  163.78975    134.25925  21.94075   13.0645     22.54125   17.1825   17.64850  385.79100   374.55050         92.3775         760.3415   222.47950  142.27500    250.27225  237.69225    0.037045      0.060484   0.024034   0.028090       0.018493   0.108705    0.166139       0.192326    0.099035     0.119575    0.151579     0.144591          0.153383           0.148380      0.148607   0.113706       0.122011    0.185356   90.45000   62.01400   97.49425   80.8920   71.88600  104.41850   60.50050   72.77325     49.7410   44.23775   48.29625   70.01550
+1             0.284954     0.307403      0.03740       3.4952               0.11400               0.17720              0.331250          0.284954              6.838891  0.209460  0.392475  0.313068  0.349027   0.166384    1999.4090  0.332560  0.332492   0.314789  0.255677  0.281898  0.279455  0.286135      0.301829       0.282802  245.03760   689.27560  366.45280  408.19100    290.45200  67.61180   31.9192     52.88460   42.9538   45.94420  866.09480   892.00060        241.3136        1758.0954   580.07900  345.12440    591.12460  483.08100    0.089232      0.069674   0.049263   0.073447       0.042816   0.348771    0.372778       0.289274    0.252130     0.267102    0.317350     0.291133          0.310853           0.306045      0.304149   0.254306       0.253463    0.378170  229.59180  167.03980  223.10500  205.8436  162.17600  190.32680  141.06700  151.68720    111.5348  107.31200  126.27760  183.44740
+2             0.188840     0.232792      0.02160       2.4548               0.06680               0.10140              0.202200          0.188840              4.532150  0.170561  0.241145  0.234589  0.217446   0.099177    1307.2240  0.201834  0.221152   0.197373  0.161667  0.179753  0.182760  0.194498      0.190489       0.188643  197.50720   416.63800  270.04040  251.12360    171.91480  39.70020   21.2306     33.15860   27.1600   28.39680  559.43540   598.14240        149.6462        1157.5778   392.91120  244.07040    416.72700  253.51540    0.066383      0.049808   0.045237   0.066113       0.029054   0.247138    0.268814       0.235239    0.214792     0.232526    0.221925     0.239111          0.243811           0.231230      0.277544   0.216120       0.226617    0.185443  147.08660  117.97700  155.32540  132.4298  128.97180  121.42820   65.37880   66.70840     74.9954   80.58300   88.49200  127.84760
+3             0.354487     0.405153      0.04300       3.8265               0.11250               0.19400              0.421125          0.354487              8.507687  0.249330  0.558766  0.487502  0.362958   0.126034    2214.0062  0.336077  0.380557   0.421322  0.347561  0.426260  0.342006  0.360723      0.379071       0.351407  260.48478   875.13608  502.62084  382.36300    193.40150  68.03924   36.5335     53.18854   43.2545   65.09972  944.78228  1003.10842        266.1155        1947.8907   679.81146  461.89898    570.82002  501.47574    0.142787      0.085714   0.038256   0.067596       0.027554   0.374348    0.450194       0.409966    0.367924     0.507369    0.392017     0.410980          0.428339           0.401775      0.422767   0.343320       0.323068    0.472363  254.26484  188.27948  217.18950  193.0810  160.54952  178.74254  168.06392  154.66928    132.8585  150.03200  179.00848  237.26714
+4             0.237152     0.372455      0.00500       4.0210               0.04900               0.08500              0.227250          0.237152              5.691647  0.157098  0.381901  0.261165  0.275336   0.104406    1679.0360  0.296264  0.292875   0.270756  0.129673  0.106946  0.234138  0.245285      0.217338       0.239733  185.37600   675.96500  308.17500  324.89600    184.62400  63.99300   28.1160     45.48700   21.7850   17.96700  730.51200   771.17600        177.3480        1501.6880   726.21500  276.60800    465.25600  210.95700    0.089129      0.091178   0.050289   0.085631       0.067956   0.439994    0.353513       0.374370    0.359046     0.177274    0.375703     0.370661          0.366359           0.373193      0.511610   0.305322       0.331785    0.167933  280.20900  276.43100  242.04100  115.6400  107.57500  115.12700   50.52500   45.30500     70.9240   83.35800  122.32600  169.57500
+
+🔥 Variables más importantes para el clustering (varianza entre centroides):
+sum_consumo        296593.875228
+s_Fin de semana    225883.440811
+s_Domingo           61558.585732
+s_Mediodia          55568.731726
+s_Sábado            51721.675678
+s_invierno          44085.844630
+s_verano            20277.470117
+s_primavera         18838.479110
+s_Tarde             16357.347630
+s_otoño             14154.923474
+s_Noche              9966.628786
+Febrero              6436.270682
+Enero                6263.587033
+s_Entre semana       4909.417273
+Diciembre            3928.646798
+Marzo                3564.760843
+s_Madrugada          3360.910442
+s_Mañana             3242.219748
+Julio                2870.990834
+Abril                2785.478788
+dtype: float64
+
+💡 Features con mayor carga en el primer componente PCA:
+Fin de semana           0.136771
+media_consumo           0.136640
+consumo_medio_diario    0.136640
+promedio_por_dia        0.136640
+sum_consumo             0.136301
+s_Fin de semana         0.135907
+s_Entre semana          0.135856
+Domingo                 0.135789
+Sábado                  0.135342
+s_Domingo               0.134901
+dtype: float64

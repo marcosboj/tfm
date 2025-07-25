@@ -17,7 +17,6 @@ BASE = Path(__file__).parent
 DATOS_CARPETA = BASE / "data" / "viviendas" / "consumos"
 
 @st.cache_data(show_spinner=False)
-@st.cache_data(show_spinner=False)
 def load_data() -> pd.DataFrame:
     dfs = []
     for fn in sorted(os.listdir(DATOS_CARPETA)):
@@ -48,12 +47,12 @@ def load_data() -> pd.DataFrame:
         _local
         .dt.tz_localize(
             'Europe/Madrid',
-            ambiguous=False,            # resuelve duplicados en otoño
-            nonexistent='shift_forward'   # desplaza horas inexistentes de primavera al siguiente instante válido
+            ambiguous=False,            # segunda 02:00 → invierno (CET)
+            nonexistent='shift_forward' # corrige salto de marzo
         )
         .dt.tz_convert('UTC')
     )
-    ########################################
+        ########################################
     # --- Columnas temporales necesarias para los boxplots ---
     df["year"]       = df["timestamp"].dt.year
     df["month"]      = df["timestamp"].dt.month

@@ -49,9 +49,12 @@ for archivo in archivos:
     import caracteristicas_consumo
     
     #filtro = "fechas"
-    filtro = "completo"
+    #filtro = "completo"
     #filtro = "mes"
+    #filtro = "meses"
     #filtro = "estacion"
+    #filtro = "dia_semana"
+    filtro = "tipo_dia"
 
 
     # Llamar a la función para extraer características del consumo
@@ -72,6 +75,6 @@ for archivo in archivos:
 
 # Guardar el DataFrame final a un CSV
 nombre_archivo = f"resumen_consumos_{nombre_filtro}.csv"
-ruta_completa = carpeta_now / "data/viviendas"
+ruta_completa = carpeta_now / "data/viviendas/resumenes"
 ruta_completa_archivo = ruta_completa / nombre_archivo
 df_resultados.to_csv(ruta_completa_archivo, index=False)
