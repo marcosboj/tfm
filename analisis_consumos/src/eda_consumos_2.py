@@ -310,20 +310,18 @@ def plot_matrix_line_por_hogar(df: pd.DataFrame, group_col: str, out_folder: Pat
 # ————————————————— Consumo medio por día del año (todas viviendas) —————————————————
 
 def plot_all_homes_dayofyear_per_year(df: pd.DataFrame, out_folder: Path):
-    years = sorted(df['year'].dropna().unique())
-    for y in years:
-        d = df[df['year']==y]
-        pivot = d.groupby(['dayofyear','hogar'])['consumptionKWh'].mean().unstack()
-        plt.figure()
-        for hogar in pivot.columns:
-            plt.plot(pivot.index, pivot[hogar], alpha=0.6, label=hogar)
-        plt.xlim(1,365)
-        plt.xlabel('Día del año')
-        plt.ylabel('kWh')
-        plt.title(f'Consumo medio por día del año {int(y)}')
-        plt.legend(fontsize=6, ncol=3)
-        plt.savefig(out_folder/f"all_homes_dayofyear_{int(y)}.png", dpi=300)
-        plt.close()
+    df['date'] = df['timestamp'].dt.floor('D')
+    pivot = df.groupby(['dayofyear','hogar'])['consumptionKWh'].mean().unstack()
+    plt.figure()
+    for hogar in pivot.columns:
+        plt.plot(pivot.index, pivot[hogar], alpha=0.6, label=hogar)
+    plt.xlim(1,365)
+    plt.xlabel('Día del año')
+    plt.ylabel('kWh')
+    plt.title(f'Consumo medio por día del año {int(y)}')
+    plt.legend(fontsize=6, ncol=3)
+    plt.savefig(out_folder/f"all_homes_dayofyear_{int(y)}.png", dpi=300)
+    plt.close()
 
 # ————————————————— Heatmaps mes vs hora matriz —————————————————
 
@@ -367,11 +365,11 @@ def main():
 
     # Histogramas y boxplots globales por hogar
     plot_hist_matrix_por_hogar(df, out_plots, bins=40)
-    for col in ['dayofweek','day_type','season','month','year','month_year']:
+    for col in ['dayofweek','day_type','season','month_year']:
         plot_boxplot_matrix_por_hogar(df, col, out_plots)
 
     # Tendencias/patrones lineales
-    for col in ['hour','dayofweek','month','year','month_year','season','day_type']:
+    for col in ['hour','dayofweek','month_year','season','day_type']:
         plot_matrix_line_por_hogar(df, col, out_plots)
 
     # Descomposición + Autocorrelación por hogar
@@ -383,9 +381,7 @@ def main():
 
     # Heatmaps mes vs hora global y por año
     plot_heatmap_matrix_month_hour(df, out_plots)
-    for y in sorted(df['year'].dropna().unique()):
-        d = df[df['year']==y]
-        plot_heatmap_matrix_month_hour(d, out_plots, suffix=str(int(y)))
+
 
     # Outliers
     detect_outliers_daily(df, out_csv)

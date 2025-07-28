@@ -152,7 +152,7 @@ with tab_global:
 
     elif tipo == "Boxplots":
         with st.spinner("Generando boxplots…"):
-            for grp in ["dayofweek","day_type","hour","month","season","year","month_year"]:
+            for grp in ["dayofweek","day_type","hour","season","month_year"]:
                 exp = st.expander(f"Boxplot vs {grp}", expanded=False)
                 with exp:
                     fig = px.box(
@@ -210,7 +210,7 @@ with tab_hogar:
     st.subheader(f"📊 Boxplots de {hogar_sel}")
     dfh = df[df["hogar"]==hogar_sel]
     # siempre dayofweek y day_type
-    for grp in ["dayofweek","day_type","hour","month","season","year","month_year"]:
+    for grp in ["dayofweek","day_type","hour","season","month_year"]:
         exp = st.expander(f"Boxplot vs {grp}", expanded=False)
         with exp:
             fig = px.box(
