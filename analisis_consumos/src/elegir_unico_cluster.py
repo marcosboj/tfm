@@ -3,6 +3,7 @@ import os
 
 # ====== Configuration ======
 # Define input and output paths
+'''
 input_path = "resultados/cluster_metrics_resumen.csv"
 output_weighted = "resultados/recomendaciones_algoritmos_resumen.csv"
 output_lex = "resultados/recomendaciones_lex_resumen.csv"
@@ -10,7 +11,7 @@ output_lex = "resultados/recomendaciones_lex_resumen.csv"
 input_path = "resultados/cluster_metrics.csv"
 output_weighted = "resultados/recomendaciones_algoritmos.csv"
 output_lex = "resultados/recomendaciones_lex.csv"
-'''
+
 # Ensure input exists
 if not os.path.isfile(input_path):
     raise FileNotFoundError(f"Input file not found: {input_path}")

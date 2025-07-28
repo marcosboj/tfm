@@ -93,6 +93,12 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
         # Ahora sí, eliminamos duplicados dejando solo la primera ocurrencia
         full_df = full_df.drop_duplicates(subset=['hogar','timestamp'], keep='first')
         print(f"Tras eliminación, quedan {len(full_df)} filas en total.")
+    # 5. Filtrar por rango de fechas deseado (UTC)
+    start_date = pd.Timestamp("2024-07-01 00:00", tz="UTC")
+    end_date = pd.Timestamp("2025-06-30 23:00", tz="UTC")
+    full_df = full_df[(full_df['timestamp'] >= start_date) & (full_df['timestamp'] <= end_date)]
+    print(f"Filtrado por fecha: quedan {len(full_df)} filas entre {start_date.date()} y {end_date.date()}.")
+
 
     return full_df
 
@@ -341,32 +347,6 @@ def plot_heatmap_matrix_month_hour(df: pd.DataFrame, out_folder: Path, suffix: s
     fig.savefig(out_folder/fname, dpi=300)
     plt.close(fig)
 
-# ————————————————— PCA —————————————————
-'''
-def aplicar_pca(df_features: pd.DataFrame, out_folder: Path, varianza_obj=0.95):
-    scaler = StandardScaler()
-    Xs = scaler.fit_transform(df_features.values)
-    pca = PCA(n_components=varianza_obj, random_state=0)
-    Xp = pca.fit_transform(Xs)
-    var_exp = pca.explained_variance_ratio_.cumsum()
-    plt.figure()
-    plt.plot(range(1,len(var_exp)+1), var_exp, marker='o')
-    plt.axhline(varianza_obj, linestyle='--')
-    plt.xlabel('Componentes'); plt.ylabel('Varianza acumulada')
-    plt.title('PCA Scree Plot')
-    plt.savefig(out_folder/"pca_varianza.png", dpi=300)
-    plt.close()
-    if Xp.shape[1] >= 2:
-        plt.figure()
-        plt.scatter(Xp[:,0], Xp[:,1], s=20, alpha=0.7)
-        plt.xlabel('PC1'); plt.ylabel('PC2')
-        plt.title('PCA PC1 vs PC2')
-        plt.savefig(out_folder/"pca_scatter.png", dpi=300)
-        plt.close()
-    pcs = pd.DataFrame(Xp, index=df_features.index,
-                       columns=[f'PC{i+1}' for i in range(Xp.shape[1])])
-    return pca, pcs
-'''
 # ————————————————— Main —————————————————
 
 def main():
@@ -410,16 +390,7 @@ def main():
     # Outliers
     detect_outliers_daily(df, out_csv)
     detect_outliers_weekly(df, out_csv)
-    '''
-    # PCA mensual último año
-    last_year = df['year'].max()
-    m = (df[df['year']==last_year]
-         .groupby(['hogar', df['month']])['consumptionKWh']
-         .sum().unstack().fillna(0))
-    m_norm = m.div(m.sum(axis=1), axis=0)
-    _, pcs = aplicar_pca(m_norm, out_plots)
-    pcs.to_csv(out_csv/"pca_components.csv", index=True)
-    '''
+
     print("EDA completo. CSV en resultados/eda/csv/, plots en resultados/eda/plots/")
 
 if __name__ == "__main__":

@@ -52,6 +52,11 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
         .dt.tz_convert('UTC')
     )
     ########################################
+        # 5. Filtrar por rango de fechas deseado (UTC)
+    start_date = pd.Timestamp("2024-07-01 00:00", tz="UTC")
+    end_date = pd.Timestamp("2025-06-30 23:00", tz="UTC")
+    full_df = full_df[(full_df['timestamp'] >= start_date) & (full_df['timestamp'] <= end_date)]
+    print(f"Filtrado por fecha: quedan {len(full_df)} filas entre {start_date.date()} y {end_date.date()}.")
 
     return full_df.dropna(subset=['timestamp'])
 
@@ -136,7 +141,7 @@ def plot_pca_scatter(Xp, labels, names, strategy, algo_name, out_path):
 
 # ————————————————— Clustering y Métricas —————————————————
 
-def aplicar_clustering(Y, X, algorithm, params, clustering_dir, strategy, algo_name, k=None):
+def aplicar_clustering(Y, X, clustering_dir, strategy, algo_name, k=None):
     labels = None
     if algo_name=='KMeans':
         model = KMeans(n_clusters=k, random_state=0)
@@ -160,15 +165,18 @@ def aplicar_clustering(Y, X, algorithm, params, clustering_dir, strategy, algo_n
     # Y.index son los nombres de hogar en el pivot
     names = Y.index.to_numpy()
     plot_pca_scatter(X, labels_ord, names, strategy, f"{algo_name}_k{k}", clustering_dir)
+
+    ####Revisar si sobra
     out_path = clustering_dir / strategy
     out_path.mkdir(parents=True, exist_ok=True)
     colname = f"{algo_name}_k{k}" if k else algo_name
+    ####
 
     # Guardar perfil horario de clusters
     summary = summary_by_cluster(Y, labels_ord)
     summary.to_csv(out_path / f"{colname}_profile.csv")
     # Calcular métricas si hay más de 1 cluster
-    n_clusters = len(set(labels_ord)) - (1 if -1 in labels_ord else 0)
+    n_clusters = len(set(labels_ord)) #DBSCAN - (1 if -1 in labels_ord else 0)
     if n_clusters>1:
         sil = silhouette_score(X, labels_ord)
         dbi = davies_bouldin_score(X, labels_ord)
@@ -185,6 +193,7 @@ def main(data_dir:Path, project_root:Path):
     df = preparar_timestamp(df)
     clustering_dir, pca_dir = crear_carpetas_project(project_root)
 
+    ###Meter en el timestamp
     # 1) Marcar días festivos vs laborables (festivos desde CSV + sáb/dom)
     festivos = pd.read_csv(project_root/'data'/'festivos_zgz.csv')['fecha'].astype(str).tolist()
     df['date_only'] = df['timestamp'].dt.strftime('%Y-%m-%d')
@@ -193,9 +202,10 @@ def main(data_dir:Path, project_root:Path):
         df['date_only'].isin(festivos) | df['weekday'].isin([5,6]),
         'festivo','laborable'
     )
+    ###
 
     # Preprocesar y PCA
-    strategies = []
+
     pivots = {'global':pivot_global(df)}
 
     # 2) Añadir estrategias laborable y festivo
@@ -245,7 +255,7 @@ def main(data_dir:Path, project_root:Path):
         loadings.to_csv(pca_dir/f"{strat}_loadings.csv")
         for algo in algos:
                 for k in k_list:
-                    m = aplicar_clustering(pivot,Xp,None,{},clustering_dir,strat,algo,k)
+                    m = aplicar_clustering(pivot,Xp,clustering_dir,strat,algo,k)
                     metrics.append(m)
                     # 2. Cálculo de feature importances escaladas
                     # 2.1. Estandarizo pivot para que cada columna tenga media 0 y varianza 1

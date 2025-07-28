@@ -52,6 +52,11 @@ def load_data() -> pd.DataFrame:
         )
         .dt.tz_convert('UTC')
     )
+    # 5. Filtrar por rango de fechas deseado (UTC)
+    start_date = pd.Timestamp("2024-07-01 00:00", tz="UTC")
+    end_date = pd.Timestamp("2025-06-30 23:00", tz="UTC")
+    df = df[(df['timestamp'] >= start_date) & (df['timestamp'] <= end_date)]
+    print(f"Filtrado por fecha: quedan {len(df)} filas entre {start_date.date()} y {end_date.date()}.")
         ########################################
     # --- Columnas temporales necesarias para los boxplots ---
     df["year"]       = df["timestamp"].dt.year

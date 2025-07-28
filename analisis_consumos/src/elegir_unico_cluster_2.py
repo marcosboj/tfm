@@ -2,9 +2,15 @@ import pandas as pd
 import os
 
 # Rutas a adaptar según tu proyecto
+'''
 WEIGHTED_CSV = "resultados/recomendaciones_algoritmos_resumen.csv"
 LEX_CSV      = "resultados/recomendaciones_lex_resumen.csv"
 FINAL_CSV    = "resultados/recomendacion_final_resumen.csv"
+'''
+WEIGHTED_CSV = "resultados/recomendaciones_algoritmos.csv"
+LEX_CSV      = "resultados/recomendaciones_lex.csv"
+FINAL_CSV    = "resultados/recomendacion_final.csv"
+
 
 # 1) Cargamos ambas recomendaciones
 df_w = pd.read_csv(WEIGHTED_CSV)

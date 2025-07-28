@@ -60,6 +60,12 @@ def caracteristicas_consumo(csv, filtro="completo"):
         'festivo','laborable'
     )
 
+     # 5. Filtrar por rango de fechas deseado (UTC)
+    start_date = pd.Timestamp("2024-07-01 00:00", tz="UTC")
+    end_date = pd.Timestamp("2025-06-30 23:00", tz="UTC")
+    datos_consumo = datos_consumo[(datos_consumo['timestamp'] >= start_date) & (datos_consumo['timestamp'] <= end_date)]
+    print(f"Filtrado por fecha: quedan {len(datos_consumo)} filas entre {start_date.date()} y {end_date.date()}.")
+
     # 5. Añadir columnas de hora, día de la semana, mes, etc.
     datos_consumo = add_timestamp_values(datos_consumo, 'timestamp')
 
@@ -70,7 +76,7 @@ def caracteristicas_consumo(csv, filtro="completo"):
             df_filtrado = datos_consumo.copy()
             nombre_filtro = "todo"
         case "fechas":
-            fecha_inicio = "2023-01-01"
+            fecha_inicio = "2024-07-01"
             fecha_fin = "2025-06-30"
             df_filtrado = datos_consumo[
                 (datos_consumo["timestamp"] >= fecha_inicio) &
@@ -92,7 +98,7 @@ def caracteristicas_consumo(csv, filtro="completo"):
             ]
             nombre_filtro = f"meses_{mes:02d}"           
         case "estacion":
-            estacion = "verano"
+            estacion = "otoño"
             datos_consumo["estacion"] = datos_consumo["timestamp"].dt.month.map(
                 lambda x: "invierno" if x in [12, 1, 2] else
                           "primavera" if x in [3, 4, 5] else
@@ -112,8 +118,8 @@ def caracteristicas_consumo(csv, filtro="completo"):
             ]
             nombre_filtro = f"dia_{nombres[dia]}"
         case "tipo_dia":
-            tipo = "festivo"
-            # filtra por day_type, usando la columna que ya creaste
+            tipo = "laborable" #(laborable festivo)
+            # filtra por day_type, usando la columna que ya creaste (laborable festivo)
             df_filtrado   = datos_consumo[
                 datos_consumo["day_type"] == tipo
             ]
