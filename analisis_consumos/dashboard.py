@@ -52,6 +52,17 @@ def load_data() -> pd.DataFrame:
         )
         .dt.tz_convert('UTC')
     )
+    
+    # ——— FILTRO GENERAL POR RANGO DE FECHAS (LOCAL) ———
+    # convertimos a fecha en Madrid y filtramos entre 01/07/2024 y 30/06/2025
+    df = df[
+        df['timestamp']
+          .dt.tz_convert('Europe/Madrid')   # volvemos a hora local
+          .dt.date
+          .between(pd.to_datetime("2024-07-01").date(),
+                   pd.to_datetime("2025-06-30").date())
+    ]
+
 
     ########################################
     # --- Columnas temporales necesarias para los boxplots ---
