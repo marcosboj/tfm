@@ -52,7 +52,7 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
         .dt.tz_convert('UTC')
     )
     ########################################
-        # 5. Filtrar por rango de fechas deseado (UTC)
+    # 5. Filtrar por rango de fechas deseado (UTC)
     start_date = pd.Timestamp("2024-07-01 00:00", tz="UTC")
     end_date = pd.Timestamp("2025-06-30 23:00", tz="UTC")
     full_df = full_df[(full_df['timestamp'] >= start_date) & (full_df['timestamp'] <= end_date)]
