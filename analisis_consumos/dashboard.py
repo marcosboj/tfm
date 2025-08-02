@@ -215,7 +215,7 @@ with tab_hogar:
         exp = st.expander(f"Boxplot vs {grp}", expanded=False)
         with exp:
             fig = px.box(
-                dfh, x=grp, y="consumptionKWh", points="outliers", boxpoints=False,
+                dfh, x=grp, y="consumptionKWh", boxpoints=False,
                 title=f"{hogar_sel}: consumo vs {grp}"
             )
             st.plotly_chart(fig, use_container_width=True)
