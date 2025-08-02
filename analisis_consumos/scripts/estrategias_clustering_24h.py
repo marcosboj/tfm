@@ -82,12 +82,7 @@ def pivot_estacional(df, season):
 
 def pivot_mensual(df, month):
     return pivot_global(df[df['month']==month])
-'''
-def pivot_rolling(df, start, window_days=90):
-    end = start + pd.Timedelta(days=window_days)
-    win = df[(df['timestamp']>=start)&(df['timestamp']<end)]
-    return pivot_global(win)
-'''
+
 def pivot_day_type(df, day_type):
     return pivot_global(df[df['day_type'] == day_type])
 

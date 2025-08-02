@@ -159,7 +159,8 @@ with tab_global:
                         df[df["hogar"].isin(sel_homes)],
                         x=grp, y="consumptionKWh",
                         facet_col="hogar", facet_col_wrap=4,
-                        title=f"Consumo vs {grp}"
+                        title=f"Consumo vs {grp}",
+                        boxpoints=False
                     )
                     st.plotly_chart(fig, use_container_width=True)
 
@@ -214,7 +215,7 @@ with tab_hogar:
         exp = st.expander(f"Boxplot vs {grp}", expanded=False)
         with exp:
             fig = px.box(
-                dfh, x=grp, y="consumptionKWh", points="outliers",
+                dfh, x=grp, y="consumptionKWh", points="outliers", boxpoints=False,
                 title=f"{hogar_sel}: consumo vs {grp}"
             )
             st.plotly_chart(fig, use_container_width=True)

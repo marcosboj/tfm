@@ -45,17 +45,10 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
         df = pd.read_csv(carpeta / fn, sep=sep)
         df['hogar'] = fn.split('_')[0]
         dfs.append(df)
-    # 1. concatenamos todo
     full_df = pd.concat(dfs, ignore_index=True)
 
-    ########################################
-    # 1) Crea la serie de fechas datetime (para el cálculo interno, NO crea columna)
     _dates = pd.to_datetime(full_df['date'], dayfirst=True)
-
-    # 2) Sustituye “24:00:00” por “00:00” sólo para parsear
     _times = full_df['time'].replace({'24:00:00': '00:00'})
-
-    # 3) Construye el timestamp local, sumando 1 día si time era “24:00:00”
     _full_local = (
         pd.to_datetime(
             _dates.dt.strftime('%Y-%m-%d') + ' ' + _times,
@@ -65,40 +58,35 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
         + pd.to_timedelta(full_df['time'].eq('24:00:00').astype(int), unit='d')
     )
 
-    # 4) Localiza en Europe/Madrid y convierte a UTC, guardando en la misma columna
     full_df['timestamp'] = (
         _full_local
         .dt.tz_localize('Europe/Madrid', ambiguous=False, nonexistent='shift_forward')
         .dt.tz_convert('UTC')
     )
+
+
     ########################################
     # 3. eliminamos filas sin timestamp válido
+    
+    
     n_nan = full_df['timestamp'].isna().sum()
     if n_nan:
-        print(f"Atención: eliminando {n_nan} filas sin timestamp válido")
         full_df = full_df.dropna(subset=['timestamp'])
 
-    # 4. detectamos duplicados reales (mismo hogar y timestamp)
     mask_dup = full_df.duplicated(subset=['hogar','timestamp'], keep=False)
     df_dups = full_df[mask_dup].sort_values(['hogar','timestamp'])
     if not df_dups.empty:
-        # Mostrar un resumen de los duplicados antes de eliminarlos
-        print("=== Estos son los registros duplicados (se eliminará uno de cada par) ===")
         print(df_dups[['hogar','timestamp','consumptionKWh']].head(20))
         print(f"Total filas marcadas como duplicadas: {len(df_dups)}")
-        # Mostrar cuántos pares únicos (hogar, timestamp) hay
-        unique_pairs = df_dups[['hogar','timestamp']].drop_duplicates()
-        print(f"Total pares (hogar, timestamp) duplicados: {len(unique_pairs)}")
 
-        # Ahora sí, eliminamos duplicados dejando solo la primera ocurrencia
         full_df = full_df.drop_duplicates(subset=['hogar','timestamp'], keep='first')
-        print(f"Tras eliminación, quedan {len(full_df)} filas en total.")
-    # 5. Filtrar por rango de fechas deseado (UTC)
+
+
+
     start_date = pd.Timestamp("2024-07-01 00:00", tz="UTC")
     end_date = pd.Timestamp("2025-06-30 23:00", tz="UTC")
     full_df = full_df[(full_df['timestamp'] >= start_date) & (full_df['timestamp'] <= end_date)]
     print(f"Filtrado por fecha: quedan {len(full_df)} filas entre {start_date.date()} y {end_date.date()}.")
-
 
     return full_df
 
@@ -106,14 +94,6 @@ def cargar_todos_consumos(carpeta: Path, sep: str = ';') -> pd.DataFrame:
 
 def preparar_timestamp(df: pd.DataFrame,project_root: Path) -> pd.DataFrame:
     df = df.copy()
-    '''
-    df['time'] = df['time'].replace('24:00:00', '00:00')
-    df['timestamp'] = pd.to_datetime(
-        df['date'] + ' ' + df['time'],
-        format='%d/%m/%Y %H:%M',
-        errors='coerce'
-    )
-    '''
     df['date_only']  = df['timestamp'].dt.date
     df['year']       = df['timestamp'].dt.year
     df['month']      = df['timestamp'].dt.month
@@ -133,7 +113,7 @@ def preparar_timestamp(df: pd.DataFrame,project_root: Path) -> pd.DataFrame:
           .dt.date
           .tolist()
     )
-    # ahora: festivo si está en CSV ó es sábado/domingo; en otro caso, laboral
+    
     df['day_type'] = np.where(
         df['date_only'].isin(festivos) | df['dayofweek'].isin([5, 6]),
         'festivo',
@@ -193,6 +173,7 @@ def descriptive_by_house(df: pd.DataFrame) -> pd.DataFrame:
     })
     return dfh.reset_index(drop=True)
 
+
 # ————————————————— Outliers —————————————————
 
 def detect_outliers_daily(df: pd.DataFrame, out_folder: Path, threshold: float = 3.0) -> pd.DataFrame:
@@ -204,13 +185,13 @@ def detect_outliers_daily(df: pd.DataFrame, out_folder: Path, threshold: float =
     return out
 
 def detect_outliers_weekly(df: pd.DataFrame, out_folder: Path, threshold: float = 3.0) -> pd.DataFrame:
-    d = df.dropna(subset=['timestamp']).copy()
+    d = df.copy()
     d['week'] = (
         d['timestamp']
-        .dt.tz_convert(None)           # dejamos el datetime naive
-        .dt.to_period('W')             # creamos PeriodArray semanal
-        .dt.to_timestamp()            # volvemos a Timestamp (naive)
-        .dt.date                       # sólo la fecha
+        .dt.tz_convert(None)           
+        .dt.to_period('W')             
+        .dt.to_timestamp()            
+        .dt.date                       
     )
     w = d.groupby(['hogar','week'])['consumptionKWh'] \
          .sum().reset_index(name='weekly_sum')
@@ -270,6 +251,11 @@ def plot_hist_matrix_por_hogar(df: pd.DataFrame, out_folder: Path, bins=30):
     fig.savefig(out_folder/"histogramas_por_hogar.png", dpi=300)
     plt.close(fig)
 
+#...
+#main
+#...
+plot_hist_matrix_por_hogar(df, out_plots, bins=40)
+
 def plot_boxplot_matrix_por_hogar(df: pd.DataFrame, group_col: str, out_folder: Path):
     df2 = df.copy()
     if group_col == 'month_year':
@@ -287,6 +273,11 @@ def plot_boxplot_matrix_por_hogar(df: pd.DataFrame, group_col: str, out_folder: 
     fig.suptitle(f'Boxplots por hogar vs {group_col}')
     fig.savefig(out_folder/f"boxplots_por_hogar_{group_col}.png", dpi=300)
     plt.close(fig)
+#...
+#main
+#...
+    for col in ['dayofweek','day_type','season','month_year']:
+        plot_boxplot_matrix_por_hogar(df, col, out_plots)
 
 # ————————————————— Líneas de media por grupo —————————————————
 
@@ -307,6 +298,13 @@ def plot_matrix_line_por_hogar(df: pd.DataFrame, group_col: str, out_folder: Pat
     fig.savefig(out_folder/f"matrix_line_por_{group_col}.png", dpi=300)
     plt.close(fig)
 
+#...
+#main
+#...
+    for col in ['hour','dayofweek','month_year','season','day_type']:
+        plot_matrix_line_por_hogar(df, col, out_plots)
+
+
 # ————————————————— Consumo medio por día del año (todas viviendas) —————————————————
 
 def plot_all_homes_dayofyear_per_year(df: pd.DataFrame, out_folder: Path):
@@ -318,9 +316,9 @@ def plot_all_homes_dayofyear_per_year(df: pd.DataFrame, out_folder: Path):
     plt.xlim(1,365)
     plt.xlabel('Día del año')
     plt.ylabel('kWh')
-    plt.title(f'Consumo medio por día del año {int(y)}')
+    plt.title(f'Consumo medio por día del año')
     plt.legend(fontsize=6, ncol=3)
-    plt.savefig(out_folder/f"all_homes_dayofyear_{int(y)}.png", dpi=300)
+    plt.savefig(out_folder/f"all_homes_dayofyear.png", dpi=300)
     plt.close()
 
 # ————————————————— Heatmaps mes vs hora matriz —————————————————
@@ -344,6 +342,10 @@ def plot_heatmap_matrix_month_hour(df: pd.DataFrame, out_folder: Path, suffix: s
     fname = f"heatmap_matrix_month_hour{('_'+suffix) if suffix else ''}.png"
     fig.savefig(out_folder/fname, dpi=300)
     plt.close(fig)
+#...
+#main
+#...
+plot_heatmap_matrix_month_hour(df, out_plots)
 
 # ————————————————— Main —————————————————
 
@@ -365,6 +367,7 @@ def main():
 
     # Histogramas y boxplots globales por hogar
     plot_hist_matrix_por_hogar(df, out_plots, bins=40)
+
     for col in ['dayofweek','day_type','season','month_year']:
         plot_boxplot_matrix_por_hogar(df, col, out_plots)
 
