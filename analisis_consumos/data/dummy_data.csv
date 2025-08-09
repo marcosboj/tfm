@@ -1,7 +1,0 @@
-nif,cups,media_consumo,std_consumo,min_consumo,max_consumo,percentil_25_consumo,percentil_50_consumo,percentil_75_consumo,invierno,otoño,primavera,verano
-"X0","0",1,2,1,2,1,2,1,2,1,2,1
-"Y1","1",1,4,1,4,1,4,1,4,1,4,1
-"Z2","2",1,0,1,0,1,0,1,0,1,0,1
-"X3","3",10,2,10,2,10,2,10,2,10,2,10
-"Y4","4",10,4,10,4,10,4,10,4,10,4,10
-"Z5","5",10,0,10,0,10,0,10,0,10,0,10

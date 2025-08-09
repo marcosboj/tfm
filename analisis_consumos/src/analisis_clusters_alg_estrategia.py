@@ -2,8 +2,8 @@
 import pandas as pd
 
 # ← Ajusta estas rutas según tu proyecto
-INPUT_CSV  = "resultados/all_labels_unified_resumen.csv"  # CSV con columnas: hogar, cluster, estrategia, algoritmo, ...
-OUTPUT_CSV = "resultados/labels_wide_resumen.csv"         # Salida deseada
+INPUT_CSV  = "resultados/all_labels_unified.csv"  # CSV con columnas: hogar, cluster, estrategia, algoritmo, ...
+OUTPUT_CSV = "resultados/labels_wide.csv"         # Salida deseada
 
 def main():
     # 1) Carga el CSV (tab separado)
